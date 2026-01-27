@@ -132,10 +132,12 @@ export type DieType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100';
 export interface DiceExpression {
   count: number;
   die: DieType;
-  modifier?: number;
+  /** Modifier to add to the roll (0 = no modifier) */
+  modifier: number;
 }
 
 export interface DamageInstance {
+  id: string;
   dice: DiceExpression;
   type: DamageType;
   condition?: string;
@@ -169,9 +171,151 @@ export interface SavingThrow {
 // -----------------------------------------------------------------------------
 
 export interface AreaOfEffect {
-  shape: 'cone' | 'cube' | 'cylinder' | 'line' | 'sphere';
+  shape: 'cone' | 'cube' | 'cylinder' | 'emanation' | 'line' | 'sphere';
   size: number;
+  /** For lines: the width (size is the length) */
+  width?: number;
   origin?: string;
+}
+
+// -----------------------------------------------------------------------------
+// Spell Types
+// -----------------------------------------------------------------------------
+
+export type SpellSchool =
+  | 'abjuration'
+  | 'conjuration'
+  | 'divination'
+  | 'enchantment'
+  | 'evocation'
+  | 'illusion'
+  | 'necromancy'
+  | 'transmutation';
+
+export type SpellClass =
+  | 'bard'
+  | 'cleric'
+  | 'druid'
+  | 'paladin'
+  | 'ranger'
+  | 'sorcerer'
+  | 'warlock'
+  | 'wizard';
+
+export const SPELL_SCHOOL_NAMES: Record<SpellSchool, string> = {
+  abjuration: 'Abjuration',
+  conjuration: 'Conjuration',
+  divination: 'Divination',
+  enchantment: 'Enchantment',
+  evocation: 'Evocation',
+  illusion: 'Illusion',
+  necromancy: 'Necromancy',
+  transmutation: 'Transmutation',
+};
+
+/** Casting time for a spell */
+export interface CastingTime {
+  type: 'action' | 'bonusAction' | 'reaction' | 'time';
+  /** For 'time' type: duration in minutes */
+  minutes?: number;
+  /** Whether the spell can be cast as a ritual (adds 10 minutes) */
+  ritual?: boolean;
+  /** For reactions and some bonus actions: what triggers the casting */
+  trigger?: string;
+}
+
+/** Range of a spell */
+export type SpellRange =
+  | { type: 'self' }
+  | { type: 'touch' }
+  | { type: 'distance'; feet: number }
+  | { type: 'sight' }
+  | { type: 'unlimited' };
+
+/** Material component details */
+export interface MaterialComponent {
+  description: string;
+  /** Gold piece cost if specified */
+  cost?: number;
+  /** Whether the component is consumed */
+  consumed?: boolean;
+}
+
+/** Spell components */
+export interface SpellComponents {
+  verbal: boolean;
+  somatic: boolean;
+  material?: MaterialComponent;
+}
+
+/** Duration of a spell */
+export type SpellDuration =
+  | { type: 'instantaneous' }
+  | { type: 'concentration'; maxDuration: string }
+  | { type: 'time'; duration: string }
+  | { type: 'untilDispelled'; concentration?: boolean }
+  | { type: 'special'; description: string };
+
+/** Scaling when cast at higher levels */
+export interface SpellScaling {
+  /** Description of how the spell scales */
+  description: string;
+  /** For damage spells: additional dice per level above base */
+  damagePerLevel?: DiceExpression;
+  /** For target spells: additional targets per level above base */
+  targetsPerLevel?: number;
+  /** For duration spells: additional duration per level */
+  durationPerLevel?: string;
+}
+
+/** Cantrip upgrade info */
+export interface CantripScaling {
+  description: string;
+  /** Levels at which the cantrip improves (typically 5, 11, 17) */
+  levels: number[];
+}
+
+/** Full spell definition - analogous to Action for entities */
+export interface Spell {
+  id: string;
+  name: string;
+  /** 0 for cantrips, 1-9 for leveled spells */
+  level: number;
+  school: SpellSchool;
+  /** Classes that have this spell on their list */
+  classes: SpellClass[];
+  castingTime: CastingTime;
+  range: SpellRange;
+  components: SpellComponents;
+  duration: SpellDuration;
+  /** Full description text */
+  description: string;
+  /** For spells with attack rolls */
+  attackType?: 'melee' | 'ranged';
+  /** For spells requiring a saving throw */
+  savingThrow?: {
+    ability: AbilityKey;
+    /** Description of success/failure effects (DC is caster's spell save DC) */
+    onSuccess?: string;
+    onFailure?: string;
+  };
+  /** Damage dealt by the spell */
+  damage?: DamageInstance[];
+  /** Healing provided by the spell */
+  healing?: DiceExpression;
+  /** Area of effect if applicable */
+  areaOfEffect?: AreaOfEffect;
+  /** Scaling when cast with higher-level slots (level 1+ spells) */
+  higherLevelScaling?: SpellScaling;
+  /** Scaling at character levels (cantrips only) */
+  cantripScaling?: CantripScaling;
+  /** Source book reference */
+  source?: string;
+}
+
+// Type guard for cantrips
+export function isCantrip(spell: Spell): boolean {
+  return spell.level === 0;
 }
 
 // -----------------------------------------------------------------------------
@@ -179,6 +323,7 @@ export interface AreaOfEffect {
 // -----------------------------------------------------------------------------
 
 interface BaseAction {
+  id: string;
   name: string;
   description?: string;
 }
@@ -195,9 +340,16 @@ export interface AttackAction extends BaseAction {
   savingThrow?: SavingThrow;
 }
 
+/** An item in a multiattack listing which attack and how many times */
+export interface MultiattackItem {
+  id: string;
+  name: string;
+  count: number;
+}
+
 export interface MultiattackAction extends BaseAction {
   actionType: 'multiattack';
-  attacks: { name: string; count: number }[];
+  attacks: MultiattackItem[];
 }
 
 export interface AbilityAction extends BaseAction {
@@ -220,17 +372,20 @@ export type Action = AttackAction | MultiattackAction | AbilityAction | GenericA
 // -----------------------------------------------------------------------------
 
 export interface Trait {
+  id: string;
   name: string;
   description: string;
 }
 
 export interface Reaction {
+  id: string;
   name: string;
   description: string;
   trigger?: string;
 }
 
 export interface LegendaryAction {
+  id: string;
   name: string;
   description: string;
   cost: number;
@@ -251,9 +406,16 @@ export interface RegionalEffect {
 // -----------------------------------------------------------------------------
 
 export interface SkillProficiency {
+  id: string;
   skill: Skill;
   expertise?: boolean;
 }
+
+// -----------------------------------------------------------------------------
+// Source Type (for Combatants)
+// -----------------------------------------------------------------------------
+
+export type SourceType = 'character' | 'monster';
 
 // -----------------------------------------------------------------------------
 // Hit Points
@@ -366,6 +528,10 @@ export interface Character extends Entity {
   toolProficiencies?: string[];
   weaponProficiencies?: string[];
   armorProficiencies?: string[];
+  /** URL to character portrait image */
+  portrait?: string;
+  /** Long-form notes */
+  notes?: string;
 }
 
 // -----------------------------------------------------------------------------
@@ -407,6 +573,12 @@ export interface Monster extends Entity {
   lairActions?: LairAction[];
   regionalEffects?: RegionalEffect[];
   source?: string;
+  /** Monster description/lore */
+  description?: string;
+  /** URL to monster image */
+  portrait?: string;
+  /** DM notes */
+  notes?: string;
 }
 
 // -----------------------------------------------------------------------------
@@ -579,7 +751,7 @@ export function calculateAverageDamage(dice: DiceExpression): number {
     d100: 50.5,
   };
 
-  const average = dice.count * dieAverages[dice.die] + (dice.modifier ?? 0);
+  const average = dice.count * dieAverages[dice.die] + dice.modifier;
   return Math.floor(average);
 }
 
@@ -596,7 +768,7 @@ export function parseDiceExpression(expr: string): DiceExpression | null {
 
   const count = parseInt(match[1], 10);
   const dieValue = parseInt(match[2], 10);
-  const modifier = match[3] ? parseInt(match[3], 10) : undefined;
+  const modifier = match[3] ? parseInt(match[3], 10) : 0;
 
   const validDice = [4, 6, 8, 10, 12, 20, 100];
   if (!validDice.includes(dieValue)) {
@@ -610,4 +782,326 @@ export function parseDiceExpression(expr: string): DiceExpression | null {
     die,
     modifier,
   };
+}
+
+// =============================================================================
+// Class Types
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Class Identifiers
+// -----------------------------------------------------------------------------
+
+export type ClassName =
+  | 'barbarian'
+  | 'bard'
+  | 'cleric'
+  | 'druid'
+  | 'fighter'
+  | 'monk'
+  | 'paladin'
+  | 'ranger'
+  | 'rogue'
+  | 'sorcerer'
+  | 'warlock'
+  | 'wizard';
+
+export const CLASS_NAMES: Record<ClassName, string> = {
+  barbarian: 'Barbarian',
+  bard: 'Bard',
+  cleric: 'Cleric',
+  druid: 'Druid',
+  fighter: 'Fighter',
+  monk: 'Monk',
+  paladin: 'Paladin',
+  ranger: 'Ranger',
+  rogue: 'Rogue',
+  sorcerer: 'Sorcerer',
+  warlock: 'Warlock',
+  wizard: 'Wizard',
+};
+
+// -----------------------------------------------------------------------------
+// Armor and Weapon Proficiencies
+// -----------------------------------------------------------------------------
+
+export type ArmorCategory = 'light' | 'medium' | 'heavy' | 'shields';
+
+export type WeaponCategory = 'simple' | 'martial';
+
+export interface WeaponProficiency {
+  category?: WeaponCategory;
+  /** Specific restrictions like "Finesse", "Light", "Melee" */
+  restriction?: string;
+  /** Specific weapons by name */
+  specific?: string[];
+}
+
+// -----------------------------------------------------------------------------
+// Spellcasting Configuration (for class definitions)
+// -----------------------------------------------------------------------------
+
+export type SpellcastingType =
+  | 'full'        // Wizard, Cleric, Druid, Bard, Sorcerer
+  | 'half'        // Paladin, Ranger
+  | 'pact'        // Warlock
+  | 'none';       // Barbarian, Fighter, Monk, Rogue
+
+export interface ClassSpellcasting {
+  type: SpellcastingType;
+  ability: AbilityKey;
+  /** Level at which spellcasting is gained (1 for full casters, 1-2 for half casters) */
+  startLevel: number;
+  /** Whether the class can cast rituals */
+  ritualCasting?: boolean;
+  /** Type of spellcasting focus */
+  focusType?: 'arcane' | 'druidic' | 'holy';
+  /** Whether the class uses a spellbook (Wizard) */
+  usesSpellbook?: boolean;
+  /** For Warlock: spell slots recover on short rest */
+  recoversOnShortRest?: boolean;
+}
+
+// -----------------------------------------------------------------------------
+// Class Resource (Rage, Focus Points, Sorcery Points, etc.)
+// -----------------------------------------------------------------------------
+
+export interface ClassResource {
+  name: string;
+  /** How many at each level (index 0 = level 1) */
+  countByLevel: (number | null)[];
+  /** When the resource recovers */
+  recovery: 'shortRest' | 'longRest' | 'both';
+  description?: string;
+}
+
+// -----------------------------------------------------------------------------
+// Scaling Value (for things like Sneak Attack, Martial Arts die, etc.)
+// -----------------------------------------------------------------------------
+
+export interface ScalingValue {
+  name: string;
+  /** Value at each level (index 0 = level 1). Can be dice strings like "1d6" or numbers */
+  valueByLevel: string[];
+  description?: string;
+}
+
+// -----------------------------------------------------------------------------
+// Feature Action (action-like abilities within class features)
+// -----------------------------------------------------------------------------
+
+/**
+ * Activation type for feature actions.
+ * Mirrors monster action types but includes class-specific options.
+ */
+export type ActivationType = 'action' | 'bonusAction' | 'reaction' | 'magicAction' | 'free' | 'special';
+
+/**
+ * Resource cost for using a feature action.
+ */
+export interface ResourceCost {
+  /** Name of the resource (e.g., "Focus Points", "Channel Divinity", "Rage") */
+  resource: string;
+  /** Amount of the resource consumed */
+  amount: number;
+  /** Alternative: can use spell slot instead */
+  alternativeSpellSlot?: number;
+}
+
+/**
+ * Scaling information for feature actions that improve at certain levels.
+ */
+export interface FeatureScaling {
+  /** Description of how the feature scales */
+  description: string;
+  /** Levels at which the feature improves */
+  levels?: number[];
+  /** Dice progression (e.g., ["1d8", "2d8", "3d8", "4d8"]) */
+  diceProgression?: string[];
+}
+
+/**
+ * An action-like ability within a class feature.
+ * Analogous to monster Action but with class-specific properties like resource costs.
+ */
+export interface FeatureAction {
+  name: string;
+  description: string;
+  /** How the action is activated */
+  activation: ActivationType;
+  /** Resource cost to use this action */
+  cost?: ResourceCost;
+  /** Range of the action */
+  range?: SpellRange;
+  /** Target description */
+  target?: string;
+  /** For actions requiring a saving throw */
+  savingThrow?: {
+    ability: AbilityKey;
+    /** How DC is calculated (e.g., "spell save DC", "8 + Str + Prof") */
+    dcCalculation?: string;
+  };
+  /** Damage dealt */
+  damage?: DamageInstance[];
+  /** Healing provided */
+  healing?: DiceExpression;
+  /** Area of effect */
+  areaOfEffect?: AreaOfEffect;
+  /** Conditions applied on failure/success */
+  conditionsApplied?: Condition[];
+  /** Duration of effects */
+  duration?: string;
+  /** How the action scales at higher levels */
+  scaling?: FeatureScaling;
+  /** Usage limits (e.g., "once per turn", "Wisdom modifier times per long rest") */
+  usageLimit?: string;
+}
+
+// -----------------------------------------------------------------------------
+// Class Feature
+// -----------------------------------------------------------------------------
+
+export interface ClassFeature {
+  name: string;
+  level: number;
+  description: string;
+  /** If this is a subclass feature slot rather than a specific feature */
+  isSubclassFeature?: boolean;
+  /** Action-like sub-abilities within this feature (e.g., Divine Spark, Turn Undead) */
+  actions?: FeatureAction[];
+}
+
+// -----------------------------------------------------------------------------
+// Subclass Feature
+// -----------------------------------------------------------------------------
+
+export interface SubclassFeature {
+  name: string;
+  level: number;
+  description: string;
+  /** Action-like sub-abilities within this feature */
+  actions?: FeatureAction[];
+}
+
+// -----------------------------------------------------------------------------
+// Subclass
+// -----------------------------------------------------------------------------
+
+export interface Subclass {
+  id: string;
+  name: string;
+  className: ClassName;
+  /** Flavor text / tagline */
+  description?: string;
+  /** The thematic tenets or principles (for Paladin oaths, etc.) */
+  tenets?: string[];
+  features: SubclassFeature[];
+  /** Spells always prepared at certain levels (for subclasses that grant spells) */
+  subclassSpells?: { level: number; spells: string[] }[];
+}
+
+// -----------------------------------------------------------------------------
+// Level Progression Row
+// -----------------------------------------------------------------------------
+
+export interface LevelProgression {
+  level: number;
+  proficiencyBonus: number;
+  features: string[];
+  /** Cantrips known (for casters) */
+  cantrips?: number;
+  /** Spells prepared/known */
+  preparedSpells?: number;
+  /** Spell slots per level (index 0 = 1st level slots) */
+  spellSlots?: number[];
+  /** For Warlock: pact slot level */
+  pactSlotLevel?: number;
+  /** Class-specific resources (e.g., Rages: 2, Rage Damage: +2) */
+  resources?: Record<string, string | number>;
+}
+
+// -----------------------------------------------------------------------------
+// Core Class Traits
+// -----------------------------------------------------------------------------
+
+export interface CoreClassTraits {
+  primaryAbility: AbilityKey | AbilityKey[];
+  hitDie: DieType;
+  savingThrows: [AbilityKey, AbilityKey];
+  /** Number of skills to choose */
+  skillChoiceCount: number;
+  /** Skills available to choose from */
+  skillChoices: Skill[];
+  weaponProficiencies: WeaponProficiency[];
+  armorProficiencies: ArmorCategory[];
+  toolProficiencies?: string[];
+  startingEquipment: {
+    optionA: string;
+    optionB: string;
+  };
+}
+
+// -----------------------------------------------------------------------------
+// Class Definition
+// -----------------------------------------------------------------------------
+
+export interface ClassDefinition {
+  id: ClassName;
+  name: string;
+  coreTraits: CoreClassTraits;
+  /** Spellcasting configuration (undefined for non-casters) */
+  spellcasting?: ClassSpellcasting;
+  /** Class resources like Rage, Focus Points, Sorcery Points */
+  resources?: ClassResource[];
+  /** Scaling values like Sneak Attack dice, Martial Arts die */
+  scalingValues?: ScalingValue[];
+  /** Level-by-level progression */
+  levelProgression: LevelProgression[];
+  /** Class features by level */
+  features: ClassFeature[];
+  /** Subclasses for this class */
+  subclasses: Subclass[];
+  /** Levels at which subclass features are gained */
+  subclassFeatureLevels: number[];
+  /** Class spell list (spell names) organized by level */
+  spellList?: Record<number, string[]>;
+  /** Additional options like Eldritch Invocations, Metamagic, Fighting Styles */
+  classOptions?: ClassOption[];
+}
+
+// -----------------------------------------------------------------------------
+// Class Option (Invocations, Metamagic, Fighting Styles, etc.)
+// -----------------------------------------------------------------------------
+
+export interface ClassOption {
+  name: string;
+  description: string;
+  /** Minimum level required */
+  levelRequirement?: number;
+  /** Other prerequisites */
+  prerequisites?: string;
+  /** Whether this option can be taken multiple times */
+  repeatable?: boolean;
+  /** Cost in resources (e.g., Sorcery Points for Metamagic) */
+  cost?: number | string;
+}
+
+// -----------------------------------------------------------------------------
+// Type Guards for Classes
+// -----------------------------------------------------------------------------
+
+export function isSpellcastingClass(cls: ClassDefinition): boolean {
+  return cls.spellcasting !== undefined && cls.spellcasting.type !== 'none';
+}
+
+export function isFullCaster(cls: ClassDefinition): boolean {
+  return cls.spellcasting?.type === 'full';
+}
+
+export function isHalfCaster(cls: ClassDefinition): boolean {
+  return cls.spellcasting?.type === 'half';
+}
+
+export function isPactCaster(cls: ClassDefinition): boolean {
+  return cls.spellcasting?.type === 'pact';
 }

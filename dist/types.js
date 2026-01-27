@@ -3,7 +3,8 @@
 // D&D 5.2e Unified Entity Schema
 // =============================================================================
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SKILL_ABILITIES = exports.ABILITY_NAMES = void 0;
+exports.CLASS_NAMES = exports.SPELL_SCHOOL_NAMES = exports.SKILL_ABILITIES = exports.ABILITY_NAMES = void 0;
+exports.isCantrip = isCantrip;
 exports.isCharacter = isCharacter;
 exports.isMonster = isMonster;
 exports.isAttackAction = isAttackAction;
@@ -20,6 +21,10 @@ exports.calculatePassivePerception = calculatePassivePerception;
 exports.calculateXPFromCR = calculateXPFromCR;
 exports.calculateAverageDamage = calculateAverageDamage;
 exports.parseDiceExpression = parseDiceExpression;
+exports.isSpellcastingClass = isSpellcastingClass;
+exports.isFullCaster = isFullCaster;
+exports.isHalfCaster = isHalfCaster;
+exports.isPactCaster = isPactCaster;
 // -----------------------------------------------------------------------------
 // Constants
 // -----------------------------------------------------------------------------
@@ -51,6 +56,20 @@ exports.SKILL_ABILITIES = {
     stealth: 'dex',
     survival: 'wis',
 };
+exports.SPELL_SCHOOL_NAMES = {
+    abjuration: 'Abjuration',
+    conjuration: 'Conjuration',
+    divination: 'Divination',
+    enchantment: 'Enchantment',
+    evocation: 'Evocation',
+    illusion: 'Illusion',
+    necromancy: 'Necromancy',
+    transmutation: 'Transmutation',
+};
+// Type guard for cantrips
+function isCantrip(spell) {
+    return spell.level === 0;
+}
 // -----------------------------------------------------------------------------
 // Type Guards
 // -----------------------------------------------------------------------------
@@ -223,4 +242,33 @@ function parseDiceExpression(expr) {
         die,
         modifier,
     };
+}
+exports.CLASS_NAMES = {
+    barbarian: 'Barbarian',
+    bard: 'Bard',
+    cleric: 'Cleric',
+    druid: 'Druid',
+    fighter: 'Fighter',
+    monk: 'Monk',
+    paladin: 'Paladin',
+    ranger: 'Ranger',
+    rogue: 'Rogue',
+    sorcerer: 'Sorcerer',
+    warlock: 'Warlock',
+    wizard: 'Wizard',
+};
+// -----------------------------------------------------------------------------
+// Type Guards for Classes
+// -----------------------------------------------------------------------------
+function isSpellcastingClass(cls) {
+    return cls.spellcasting !== undefined && cls.spellcasting.type !== 'none';
+}
+function isFullCaster(cls) {
+    return cls.spellcasting?.type === 'full';
+}
+function isHalfCaster(cls) {
+    return cls.spellcasting?.type === 'half';
+}
+function isPactCaster(cls) {
+    return cls.spellcasting?.type === 'pact';
 }
