@@ -20,6 +20,12 @@ import {
   parseDiceExpression,
 } from './types';
 
+// Simple unique ID generator for sub-items
+let uniqueIdCounter = 0;
+function generateUniqueId(prefix: string): string {
+  return `${prefix}_${++uniqueIdCounter}`;
+}
+
 // Valid schools
 const SCHOOLS: SpellSchool[] = [
   'abjuration',
@@ -304,6 +310,7 @@ function parseDamageFromText(text: string): DamageInstance[] {
     const parsed = parseDiceExpression(diceStr);
     if (parsed && DAMAGE_TYPES.includes(typeStr as DamageType)) {
       damages.push({
+        id: generateUniqueId('dmg'),
         dice: parsed,
         type: typeStr as DamageType,
       });

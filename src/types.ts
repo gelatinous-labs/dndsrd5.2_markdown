@@ -491,7 +491,8 @@ export interface Currency {
   pp?: number;
 }
 
-export interface Equipment {
+/** Item in a character's inventory (not the full item definition) */
+export interface CharacterItem {
   name: string;
   quantity: number;
   equipped?: boolean;
@@ -523,7 +524,7 @@ export interface Character extends Entity {
   deathSaves: DeathSaves;
   spellcasting?: CharacterSpellcasting;
   feats?: Feat[];
-  equipment?: Equipment[];
+  equipment?: CharacterItem[];
   currency?: Currency;
   toolProficiencies?: string[];
   weaponProficiencies?: string[];
@@ -1104,4 +1105,358 @@ export function isHalfCaster(cls: ClassDefinition): boolean {
 
 export function isPactCaster(cls: ClassDefinition): boolean {
   return cls.spellcasting?.type === 'pact';
+}
+
+// =============================================================================
+// Inventory Item Types (Equipment & Magic Items)
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Cost
+// -----------------------------------------------------------------------------
+
+export type CurrencyType = 'cp' | 'sp' | 'ep' | 'gp' | 'pp';
+
+export interface Cost {
+  amount: number;
+  currency: CurrencyType;
+}
+
+// -----------------------------------------------------------------------------
+// Inventory Item Base
+// -----------------------------------------------------------------------------
+
+export interface InventoryItem {
+  id: string;
+  name: string;
+  itemType: 'equipment' | 'magicItem';
+  weight?: number;
+  cost?: Cost;
+  description?: string;
+  source?: string;
+}
+
+// -----------------------------------------------------------------------------
+// Weapon Types
+// -----------------------------------------------------------------------------
+
+export type WeaponProperty =
+  | 'ammunition'
+  | 'finesse'
+  | 'heavy'
+  | 'light'
+  | 'loading'
+  | 'reach'
+  | 'thrown'
+  | 'twoHanded'
+  | 'versatile';
+
+export type WeaponMastery =
+  | 'cleave'
+  | 'graze'
+  | 'nick'
+  | 'push'
+  | 'sap'
+  | 'slow'
+  | 'topple'
+  | 'vex';
+
+export interface WeaponDefinition extends InventoryItem {
+  itemType: 'equipment';
+  equipmentCategory: 'weapon';
+  weaponType: 'simple' | 'martial';
+  attackType: 'melee' | 'ranged';
+  damage: {
+    dice: DiceExpression;
+    type: DamageType;
+  };
+  /** Damage when used two-handed (for versatile weapons) */
+  versatileDamage?: {
+    dice: DiceExpression;
+    type: DamageType;
+  };
+  properties: WeaponProperty[];
+  /** Range for ranged or thrown weapons */
+  range?: {
+    normal: number;
+    long: number;
+  };
+  mastery?: WeaponMastery;
+}
+
+// -----------------------------------------------------------------------------
+// Armor Types
+// -----------------------------------------------------------------------------
+
+export type ArmorType = 'light' | 'medium' | 'heavy' | 'shield';
+
+export interface ArmorDefinition extends InventoryItem {
+  itemType: 'equipment';
+  equipmentCategory: 'armor';
+  armorType: ArmorType;
+  ac: {
+    base: number;
+    /** true = full Dex, 'max2' = Dex max +2, false/undefined = no Dex bonus */
+    dexBonus?: boolean | 'max2';
+  };
+  strengthRequirement?: number;
+  stealthDisadvantage?: boolean;
+}
+
+// -----------------------------------------------------------------------------
+// Tool Types
+// -----------------------------------------------------------------------------
+
+export type ToolType = 'artisan' | 'gaming' | 'musical' | 'other';
+
+export interface ToolVariant {
+  name: string;
+  cost: Cost;
+  weight?: number;
+}
+
+export interface ToolDefinition extends InventoryItem {
+  itemType: 'equipment';
+  equipmentCategory: 'tool';
+  toolType: ToolType;
+  ability: AbilityKey;
+  utilizeAction?: string;
+  craftItems?: string[];
+  variants?: ToolVariant[];
+}
+
+// -----------------------------------------------------------------------------
+// Adventuring Gear Types
+// -----------------------------------------------------------------------------
+
+export type GearType = 'pack' | 'focus' | 'container' | 'consumable' | 'ammunition' | 'general';
+
+export type FocusType = 'arcane' | 'druidic' | 'holy';
+
+export interface GearDefinition extends InventoryItem {
+  itemType: 'equipment';
+  equipmentCategory: 'gear';
+  gearType?: GearType;
+  /** For containers: capacity description */
+  capacity?: string;
+  /** For items with active use: how they're activated */
+  usageAction?: ActivationType;
+  /** For packs: contents list */
+  packContents?: string[];
+  /** For spellcasting foci */
+  focusType?: FocusType;
+  /** For ammunition: quantity when purchased */
+  quantity?: number;
+  /** For ammunition: storage item name */
+  storage?: string;
+}
+
+// -----------------------------------------------------------------------------
+// Equipment Union Type
+// -----------------------------------------------------------------------------
+
+export type EquipmentDefinition =
+  | WeaponDefinition
+  | ArmorDefinition
+  | ToolDefinition
+  | GearDefinition;
+
+// -----------------------------------------------------------------------------
+// Magic Item Types
+// -----------------------------------------------------------------------------
+
+export type MagicItemRarity =
+  | 'common'
+  | 'uncommon'
+  | 'rare'
+  | 'veryRare'
+  | 'legendary'
+  | 'artifact';
+
+export type MagicItemCategory =
+  | 'armor'
+  | 'potion'
+  | 'ring'
+  | 'rod'
+  | 'scroll'
+  | 'staff'
+  | 'wand'
+  | 'weapon'
+  | 'wondrousItem';
+
+export interface MagicItemCharges {
+  max: number;
+  current?: number;
+  /** Dice expression for recharge amount, e.g., "1d6+4" */
+  rechargeAmount?: string;
+  /** When the item recharges, e.g., "at dawn" */
+  rechargeCondition?: string;
+}
+
+export interface MagicItemAbility {
+  name: string;
+  description: string;
+  activation?: ActivationType;
+  /** Charge cost to use this ability */
+  chargeCost?: number;
+  /** If the ability casts a spell */
+  spell?: string;
+  /** Spell level if casting at a specific level */
+  spellLevel?: number;
+}
+
+export interface MagicItemBonuses {
+  ac?: number;
+  attackRoll?: number;
+  damageRoll?: number;
+  savingThrows?: number;
+  /** Set ability score to a specific value */
+  abilityScore?: {
+    ability: AbilityKey;
+    value: number;
+  };
+  /** Bonus to spell save DC */
+  spellSaveDC?: number;
+  /** Bonus to spell attack rolls */
+  spellAttack?: number;
+}
+
+export interface MagicItemDefinition extends InventoryItem {
+  itemType: 'magicItem';
+  category: MagicItemCategory;
+  rarity: MagicItemRarity;
+  requiresAttunement: boolean;
+  /** Prerequisites for attunement, e.g., "by a spellcaster", "by a cleric" */
+  attunementPrerequisites?: string[];
+  charges?: MagicItemCharges;
+  /** Whether the item is consumed when used */
+  consumable: boolean;
+  cursed?: boolean;
+  curseDescription?: string;
+  /** Base item type for armor/weapon magic items, e.g., "Plate Armor", "Longsword" */
+  baseItemType?: string;
+  /** Restrictions on base item, e.g., "Any Medium or Heavy, Except Hide Armor" */
+  baseItemRestriction?: string;
+  /** Numeric bonuses granted by the item */
+  bonuses?: MagicItemBonuses;
+  /** Special abilities of the item */
+  abilities?: MagicItemAbility[];
+  /** Damage resistances granted */
+  resistances?: DamageType[];
+  /** Damage immunities granted */
+  immunities?: DamageType[];
+  /** Condition immunities granted */
+  conditionImmunities?: Condition[];
+  /** Spells the item allows you to cast */
+  spellsGranted?: {
+    spell: string;
+    /** "atWill", "1/day", etc. */
+    frequency?: string;
+    chargeCost?: number;
+  }[];
+}
+
+// -----------------------------------------------------------------------------
+// Constants for Magic Items
+// -----------------------------------------------------------------------------
+
+export const MAGIC_ITEM_RARITY_VALUES: Record<MagicItemRarity, number | null> = {
+  common: 100,
+  uncommon: 400,
+  rare: 4000,
+  veryRare: 40000,
+  legendary: 200000,
+  artifact: null, // Priceless
+};
+
+export const MAGIC_ITEM_CRAFTING_TIME: Record<Exclude<MagicItemRarity, 'artifact'>, number> = {
+  common: 5,
+  uncommon: 10,
+  rare: 50,
+  veryRare: 125,
+  legendary: 250,
+};
+
+export const MAGIC_ITEM_CRAFTING_COST: Record<Exclude<MagicItemRarity, 'artifact'>, number> = {
+  common: 50,
+  uncommon: 200,
+  rare: 2000,
+  veryRare: 20000,
+  legendary: 100000,
+};
+
+// -----------------------------------------------------------------------------
+// Type Guards for Inventory Items
+// -----------------------------------------------------------------------------
+
+export function isEquipment(item: InventoryItem): item is EquipmentDefinition {
+  return item.itemType === 'equipment';
+}
+
+export function isMagicItem(item: InventoryItem): item is MagicItemDefinition {
+  return item.itemType === 'magicItem';
+}
+
+export function isWeapon(item: InventoryItem): item is WeaponDefinition {
+  return item.itemType === 'equipment' && (item as WeaponDefinition).equipmentCategory === 'weapon';
+}
+
+export function isArmor(item: InventoryItem): item is ArmorDefinition {
+  return item.itemType === 'equipment' && (item as ArmorDefinition).equipmentCategory === 'armor';
+}
+
+export function isTool(item: InventoryItem): item is ToolDefinition {
+  return item.itemType === 'equipment' && (item as ToolDefinition).equipmentCategory === 'tool';
+}
+
+export function isGear(item: InventoryItem): item is GearDefinition {
+  return item.itemType === 'equipment' && (item as GearDefinition).equipmentCategory === 'gear';
+}
+
+// -----------------------------------------------------------------------------
+// Helper Functions for Inventory Items
+// -----------------------------------------------------------------------------
+
+/**
+ * Calculate the GP value of a magic item by its rarity.
+ * Returns null for artifacts (priceless).
+ * Halves value for consumables except spell scrolls.
+ */
+export function calculateMagicItemValue(
+  item: MagicItemDefinition,
+  isSpellScroll: boolean = false
+): number | null {
+  const baseValue = MAGIC_ITEM_RARITY_VALUES[item.rarity];
+  if (baseValue === null) return null;
+
+  // Consumables are worth half, except spell scrolls
+  if (item.consumable && !isSpellScroll) {
+    return Math.floor(baseValue / 2);
+  }
+
+  return baseValue;
+}
+
+/**
+ * Calculate AC for a character wearing armor.
+ */
+export function calculateArmorAC(
+  armor: ArmorDefinition,
+  dexModifier: number,
+  hasShield: boolean = false
+): number {
+  let ac = armor.ac.base;
+
+  if (armor.ac.dexBonus === true) {
+    ac += dexModifier;
+  } else if (armor.ac.dexBonus === 'max2') {
+    ac += Math.min(dexModifier, 2);
+  }
+  // If dexBonus is false or undefined, no Dex bonus
+
+  if (hasShield) {
+    ac += 2;
+  }
+
+  return ac;
 }

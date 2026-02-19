@@ -28,7 +28,14 @@ import {
   ArmorCategory,
   WeaponProficiency,
   parseDiceExpression,
+  AreaOfEffect,
 } from './types';
+
+// Simple unique ID generator
+let idCounter = 0;
+function generateId(prefix: string): string {
+  return `${prefix}_${++idCounter}`;
+}
 
 // Mapping of class names
 const CLASS_NAME_MAP: Record<string, ClassName> = {
@@ -181,6 +188,7 @@ function parseActionDamage(text: string): DamageInstance[] {
     const parsed = parseDiceExpression(diceStr);
     if (parsed && DAMAGE_TYPES.includes(typeStr as DamageType)) {
       damages.push({
+        id: generateId('dmg'),
         dice: parsed,
         type: typeStr as DamageType,
       });

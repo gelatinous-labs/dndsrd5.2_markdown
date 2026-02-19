@@ -2394,16 +2394,19 @@
             },
             "damage": [
               {
+                "id": "dmg_1",
                 "dice": {
                   "count": 2,
-                  "die": "d6"
+                  "die": "d6",
+                  "modifier": 0
                 },
                 "type": "necrotic"
               }
             ],
             "healing": {
               "count": 2,
-              "die": "d6"
+              "die": "d6",
+              "modifier": 0
             },
             "cost": {
               "resource": "Wild Shape and choose a point within",
@@ -2484,16 +2487,19 @@
                 },
                 "damage": [
                   {
+                    "id": "dmg_2",
                     "dice": {
                       "count": 2,
-                      "die": "d6"
+                      "die": "d6",
+                      "modifier": 0
                     },
                     "type": "necrotic"
                   }
                 ],
                 "healing": {
                   "count": 2,
-                  "die": "d6"
+                  "die": "d6",
+                  "modifier": 0
                 },
                 "cost": {
                   "resource": "Wild Shape and choose a point within",
@@ -2967,7 +2973,8 @@
             "activation": "bonusAction",
             "healing": {
               "count": 1,
-              "die": "d10"
+              "die": "d10",
+              "modifier": 0
             },
             "cost": {
               "resource": "it to regain Hit Points equal to",

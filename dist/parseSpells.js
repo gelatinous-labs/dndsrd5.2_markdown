@@ -36,6 +36,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const types_1 = require("./types");
+// Simple unique ID generator for sub-items
+let uniqueIdCounter = 0;
+function generateUniqueId(prefix) {
+    return `${prefix}_${++uniqueIdCounter}`;
+}
 // Valid schools
 const SCHOOLS = [
     'abjuration',
@@ -274,6 +279,7 @@ function parseDamageFromText(text) {
         const parsed = (0, types_1.parseDiceExpression)(diceStr);
         if (parsed && DAMAGE_TYPES.includes(typeStr)) {
             damages.push({
+                id: generateUniqueId('dmg'),
                 dice: parsed,
                 type: typeStr,
             });

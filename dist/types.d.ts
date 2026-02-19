@@ -19,9 +19,11 @@ export type DieType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100';
 export interface DiceExpression {
     count: number;
     die: DieType;
-    modifier?: number;
+    /** Modifier to add to the roll (0 = no modifier) */
+    modifier: number;
 }
 export interface DamageInstance {
+    id: string;
     dice: DiceExpression;
     type: DamageType;
     condition?: string;
@@ -158,6 +160,7 @@ export interface Spell {
 }
 export declare function isCantrip(spell: Spell): boolean;
 interface BaseAction {
+    id: string;
     name: string;
     description?: string;
 }
@@ -175,12 +178,15 @@ export interface AttackAction extends BaseAction {
     damage: DamageInstance[];
     savingThrow?: SavingThrow;
 }
+/** An item in a multiattack listing which attack and how many times */
+export interface MultiattackItem {
+    id: string;
+    name: string;
+    count: number;
+}
 export interface MultiattackAction extends BaseAction {
     actionType: 'multiattack';
-    attacks: {
-        name: string;
-        count: number;
-    }[];
+    attacks: MultiattackItem[];
 }
 export interface AbilityAction extends BaseAction {
     actionType: 'ability';
@@ -201,15 +207,18 @@ export interface GenericAction extends BaseAction {
 }
 export type Action = AttackAction | MultiattackAction | AbilityAction | GenericAction;
 export interface Trait {
+    id: string;
     name: string;
     description: string;
 }
 export interface Reaction {
+    id: string;
     name: string;
     description: string;
     trigger?: string;
 }
 export interface LegendaryAction {
+    id: string;
     name: string;
     description: string;
     cost: number;
@@ -223,9 +232,11 @@ export interface RegionalEffect {
     radius?: number;
 }
 export interface SkillProficiency {
+    id: string;
     skill: Skill;
     expertise?: boolean;
 }
+export type SourceType = 'character' | 'monster';
 export interface HitPoints {
     current: number;
     max: number;
@@ -284,7 +295,8 @@ export interface Currency {
     gp?: number;
     pp?: number;
 }
-export interface Equipment {
+/** Item in a character's inventory (not the full item definition) */
+export interface CharacterItem {
     name: string;
     quantity: number;
     equipped?: boolean;
@@ -310,11 +322,15 @@ export interface Character extends Entity {
     deathSaves: DeathSaves;
     spellcasting?: CharacterSpellcasting;
     feats?: Feat[];
-    equipment?: Equipment[];
+    equipment?: CharacterItem[];
     currency?: Currency;
     toolProficiencies?: string[];
     weaponProficiencies?: string[];
     armorProficiencies?: string[];
+    /** URL to character portrait image */
+    portrait?: string;
+    /** Long-form notes */
+    notes?: string;
 }
 export interface MonsterSpellcasting {
     spellcastingAbility: AbilityKey;
@@ -345,6 +361,12 @@ export interface Monster extends Entity {
     lairActions?: LairAction[];
     regionalEffects?: RegionalEffect[];
     source?: string;
+    /** Monster description/lore */
+    description?: string;
+    /** URL to monster image */
+    portrait?: string;
+    /** DM notes */
+    notes?: string;
 }
 export declare function isCharacter(entity: Entity): entity is Character;
 export declare function isMonster(entity: Entity): entity is Monster;
@@ -596,4 +618,179 @@ export declare function isSpellcastingClass(cls: ClassDefinition): boolean;
 export declare function isFullCaster(cls: ClassDefinition): boolean;
 export declare function isHalfCaster(cls: ClassDefinition): boolean;
 export declare function isPactCaster(cls: ClassDefinition): boolean;
+export type CurrencyType = 'cp' | 'sp' | 'ep' | 'gp' | 'pp';
+export interface Cost {
+    amount: number;
+    currency: CurrencyType;
+}
+export interface InventoryItem {
+    id: string;
+    name: string;
+    itemType: 'equipment' | 'magicItem';
+    weight?: number;
+    cost?: Cost;
+    description?: string;
+    source?: string;
+}
+export type WeaponProperty = 'ammunition' | 'finesse' | 'heavy' | 'light' | 'loading' | 'reach' | 'thrown' | 'twoHanded' | 'versatile';
+export type WeaponMastery = 'cleave' | 'graze' | 'nick' | 'push' | 'sap' | 'slow' | 'topple' | 'vex';
+export interface WeaponDefinition extends InventoryItem {
+    itemType: 'equipment';
+    equipmentCategory: 'weapon';
+    weaponType: 'simple' | 'martial';
+    attackType: 'melee' | 'ranged';
+    damage: {
+        dice: DiceExpression;
+        type: DamageType;
+    };
+    /** Damage when used two-handed (for versatile weapons) */
+    versatileDamage?: {
+        dice: DiceExpression;
+        type: DamageType;
+    };
+    properties: WeaponProperty[];
+    /** Range for ranged or thrown weapons */
+    range?: {
+        normal: number;
+        long: number;
+    };
+    mastery?: WeaponMastery;
+}
+export type ArmorType = 'light' | 'medium' | 'heavy' | 'shield';
+export interface ArmorDefinition extends InventoryItem {
+    itemType: 'equipment';
+    equipmentCategory: 'armor';
+    armorType: ArmorType;
+    ac: {
+        base: number;
+        /** true = full Dex, 'max2' = Dex max +2, false/undefined = no Dex bonus */
+        dexBonus?: boolean | 'max2';
+    };
+    strengthRequirement?: number;
+    stealthDisadvantage?: boolean;
+}
+export type ToolType = 'artisan' | 'gaming' | 'musical' | 'other';
+export interface ToolVariant {
+    name: string;
+    cost: Cost;
+    weight?: number;
+}
+export interface ToolDefinition extends InventoryItem {
+    itemType: 'equipment';
+    equipmentCategory: 'tool';
+    toolType: ToolType;
+    ability: AbilityKey;
+    utilizeAction?: string;
+    craftItems?: string[];
+    variants?: ToolVariant[];
+}
+export type GearType = 'pack' | 'focus' | 'container' | 'consumable' | 'ammunition' | 'general';
+export type FocusType = 'arcane' | 'druidic' | 'holy';
+export interface GearDefinition extends InventoryItem {
+    itemType: 'equipment';
+    equipmentCategory: 'gear';
+    gearType?: GearType;
+    /** For containers: capacity description */
+    capacity?: string;
+    /** For items with active use: how they're activated */
+    usageAction?: ActivationType;
+    /** For packs: contents list */
+    packContents?: string[];
+    /** For spellcasting foci */
+    focusType?: FocusType;
+    /** For ammunition: quantity when purchased */
+    quantity?: number;
+    /** For ammunition: storage item name */
+    storage?: string;
+}
+export type EquipmentDefinition = WeaponDefinition | ArmorDefinition | ToolDefinition | GearDefinition;
+export type MagicItemRarity = 'common' | 'uncommon' | 'rare' | 'veryRare' | 'legendary' | 'artifact';
+export type MagicItemCategory = 'armor' | 'potion' | 'ring' | 'rod' | 'scroll' | 'staff' | 'wand' | 'weapon' | 'wondrousItem';
+export interface MagicItemCharges {
+    max: number;
+    current?: number;
+    /** Dice expression for recharge amount, e.g., "1d6+4" */
+    rechargeAmount?: string;
+    /** When the item recharges, e.g., "at dawn" */
+    rechargeCondition?: string;
+}
+export interface MagicItemAbility {
+    name: string;
+    description: string;
+    activation?: ActivationType;
+    /** Charge cost to use this ability */
+    chargeCost?: number;
+    /** If the ability casts a spell */
+    spell?: string;
+    /** Spell level if casting at a specific level */
+    spellLevel?: number;
+}
+export interface MagicItemBonuses {
+    ac?: number;
+    attackRoll?: number;
+    damageRoll?: number;
+    savingThrows?: number;
+    /** Set ability score to a specific value */
+    abilityScore?: {
+        ability: AbilityKey;
+        value: number;
+    };
+    /** Bonus to spell save DC */
+    spellSaveDC?: number;
+    /** Bonus to spell attack rolls */
+    spellAttack?: number;
+}
+export interface MagicItemDefinition extends InventoryItem {
+    itemType: 'magicItem';
+    category: MagicItemCategory;
+    rarity: MagicItemRarity;
+    requiresAttunement: boolean;
+    /** Prerequisites for attunement, e.g., "by a spellcaster", "by a cleric" */
+    attunementPrerequisites?: string[];
+    charges?: MagicItemCharges;
+    /** Whether the item is consumed when used */
+    consumable: boolean;
+    cursed?: boolean;
+    curseDescription?: string;
+    /** Base item type for armor/weapon magic items, e.g., "Plate Armor", "Longsword" */
+    baseItemType?: string;
+    /** Restrictions on base item, e.g., "Any Medium or Heavy, Except Hide Armor" */
+    baseItemRestriction?: string;
+    /** Numeric bonuses granted by the item */
+    bonuses?: MagicItemBonuses;
+    /** Special abilities of the item */
+    abilities?: MagicItemAbility[];
+    /** Damage resistances granted */
+    resistances?: DamageType[];
+    /** Damage immunities granted */
+    immunities?: DamageType[];
+    /** Condition immunities granted */
+    conditionImmunities?: Condition[];
+    /** Spells the item allows you to cast */
+    spellsGranted?: {
+        spell: string;
+        /** "atWill", "1/day", etc. */
+        frequency?: string;
+        chargeCost?: number;
+    }[];
+}
+export declare const MAGIC_ITEM_RARITY_VALUES: Record<MagicItemRarity, number | null>;
+export declare const MAGIC_ITEM_CRAFTING_TIME: Record<Exclude<MagicItemRarity, 'artifact'>, number>;
+export declare const MAGIC_ITEM_CRAFTING_COST: Record<Exclude<MagicItemRarity, 'artifact'>, number>;
+export declare function isEquipment(item: InventoryItem): item is EquipmentDefinition;
+export declare function isMagicItem(item: InventoryItem): item is MagicItemDefinition;
+export declare function isWeapon(item: InventoryItem): item is WeaponDefinition;
+export declare function isArmor(item: InventoryItem): item is ArmorDefinition;
+export declare function isTool(item: InventoryItem): item is ToolDefinition;
+export declare function isGear(item: InventoryItem): item is GearDefinition;
+/**
+ * Calculate the GP value of a magic item by its rarity.
+ * Returns null for artifacts (priceless).
+ * Halves value for consumables except spell scrolls.
+ */
+export declare function calculateMagicItemValue(item: MagicItemDefinition, isSpellScroll?: boolean): number | null;
+/**
+ * Calculate AC for a character wearing armor.
+ */
+export declare function calculateArmorAC(armor: ArmorDefinition, dexModifier: number, hasShield?: boolean): number;
 export {};

@@ -36,6 +36,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const types_1 = require("./types");
+// Simple unique ID generator for sub-items
+let uniqueIdCounter = 0;
+function generateUniqueId(prefix) {
+    return `${prefix}_${++uniqueIdCounter}`;
+}
 // Mapping for skill names from markdown to our Skill type
 const SKILL_NAME_MAP = {
     acrobatics: 'acrobatics',
@@ -261,7 +266,7 @@ function parseSkills(skillsText) {
         const skillName = match[1].trim().toLowerCase();
         const skill = SKILL_NAME_MAP[skillName];
         if (skill) {
-            skills.push({ skill });
+            skills.push({ id: generateUniqueId('skill'), skill });
         }
     }
     return skills;
@@ -338,6 +343,7 @@ function parseDamageFromText(text) {
         const parsed = (0, types_1.parseDiceExpression)(diceExpr);
         if (parsed && DAMAGE_TYPES.includes(typeStr)) {
             damages.push({
+                id: generateUniqueId('dmg'),
                 dice: parsed,
                 type: typeStr,
             });
@@ -367,10 +373,11 @@ function parseAction(name, description) {
                 };
                 count = countMap[countStr] || 1;
             }
-            attacks.push({ name: match[2], count });
+            attacks.push({ id: generateUniqueId('ma'), name: match[2], count });
         }
         return {
             actionType: 'multiattack',
+            id: generateUniqueId('action'),
             name,
             description,
             attacks,
@@ -406,6 +413,7 @@ function parseAction(name, description) {
         const damage = parseDamageFromText(description);
         return {
             actionType: 'attack',
+            id: generateUniqueId('action'),
             name,
             description,
             attackType,
@@ -445,6 +453,7 @@ function parseAction(name, description) {
         const damage = parseDamageFromText(description);
         return {
             actionType: 'ability',
+            id: generateUniqueId('action'),
             name: name.replace(/\s*\([^)]+\)\s*$/, '').trim(), // Remove recharge/usage from name
             description,
             savingThrow: { ability, dc },
@@ -456,12 +465,13 @@ function parseAction(name, description) {
     // Generic action (fallback)
     return {
         actionType: 'generic',
+        id: generateUniqueId('action'),
         name,
         description,
     };
 }
 function parseTrait(name, description) {
-    return { name, description };
+    return { id: generateUniqueId('trait'), name, description };
 }
 function parseLegendaryAction(name, description) {
     // Most legendary actions cost 1
@@ -472,6 +482,7 @@ function parseLegendaryAction(name, description) {
         cost = parseInt(costMatch[1], 10);
     }
     return {
+        id: generateUniqueId('la'),
         name: name.replace(/\s*\([^)]+\)\s*$/, '').trim(),
         description,
         cost,
@@ -626,7 +637,7 @@ function parseMonsterBlock(block) {
                     bonusActions.push(parseAction(currentItemName, desc));
                     break;
                 case 'reactions':
-                    reactions.push({ name: currentItemName, description: desc });
+                    reactions.push({ id: generateUniqueId('reaction'), name: currentItemName, description: desc });
                     break;
                 case 'legendary actions':
                     legendaryActions.push(parseLegendaryAction(currentItemName, desc));

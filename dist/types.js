@@ -3,7 +3,7 @@
 // D&D 5.2e Unified Entity Schema
 // =============================================================================
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CLASS_NAMES = exports.SPELL_SCHOOL_NAMES = exports.SKILL_ABILITIES = exports.ABILITY_NAMES = void 0;
+exports.MAGIC_ITEM_CRAFTING_COST = exports.MAGIC_ITEM_CRAFTING_TIME = exports.MAGIC_ITEM_RARITY_VALUES = exports.CLASS_NAMES = exports.SPELL_SCHOOL_NAMES = exports.SKILL_ABILITIES = exports.ABILITY_NAMES = void 0;
 exports.isCantrip = isCantrip;
 exports.isCharacter = isCharacter;
 exports.isMonster = isMonster;
@@ -25,6 +25,14 @@ exports.isSpellcastingClass = isSpellcastingClass;
 exports.isFullCaster = isFullCaster;
 exports.isHalfCaster = isHalfCaster;
 exports.isPactCaster = isPactCaster;
+exports.isEquipment = isEquipment;
+exports.isMagicItem = isMagicItem;
+exports.isWeapon = isWeapon;
+exports.isArmor = isArmor;
+exports.isTool = isTool;
+exports.isGear = isGear;
+exports.calculateMagicItemValue = calculateMagicItemValue;
+exports.calculateArmorAC = calculateArmorAC;
 // -----------------------------------------------------------------------------
 // Constants
 // -----------------------------------------------------------------------------
@@ -217,7 +225,7 @@ function calculateAverageDamage(dice) {
         d20: 10.5,
         d100: 50.5,
     };
-    const average = dice.count * dieAverages[dice.die] + (dice.modifier ?? 0);
+    const average = dice.count * dieAverages[dice.die] + dice.modifier;
     return Math.floor(average);
 }
 /**
@@ -231,7 +239,7 @@ function parseDiceExpression(expr) {
     }
     const count = parseInt(match[1], 10);
     const dieValue = parseInt(match[2], 10);
-    const modifier = match[3] ? parseInt(match[3], 10) : undefined;
+    const modifier = match[3] ? parseInt(match[3], 10) : 0;
     const validDice = [4, 6, 8, 10, 12, 20, 100];
     if (!validDice.includes(dieValue)) {
         return null;
@@ -271,4 +279,85 @@ function isHalfCaster(cls) {
 }
 function isPactCaster(cls) {
     return cls.spellcasting?.type === 'pact';
+}
+// -----------------------------------------------------------------------------
+// Constants for Magic Items
+// -----------------------------------------------------------------------------
+exports.MAGIC_ITEM_RARITY_VALUES = {
+    common: 100,
+    uncommon: 400,
+    rare: 4000,
+    veryRare: 40000,
+    legendary: 200000,
+    artifact: null, // Priceless
+};
+exports.MAGIC_ITEM_CRAFTING_TIME = {
+    common: 5,
+    uncommon: 10,
+    rare: 50,
+    veryRare: 125,
+    legendary: 250,
+};
+exports.MAGIC_ITEM_CRAFTING_COST = {
+    common: 50,
+    uncommon: 200,
+    rare: 2000,
+    veryRare: 20000,
+    legendary: 100000,
+};
+// -----------------------------------------------------------------------------
+// Type Guards for Inventory Items
+// -----------------------------------------------------------------------------
+function isEquipment(item) {
+    return item.itemType === 'equipment';
+}
+function isMagicItem(item) {
+    return item.itemType === 'magicItem';
+}
+function isWeapon(item) {
+    return item.itemType === 'equipment' && item.equipmentCategory === 'weapon';
+}
+function isArmor(item) {
+    return item.itemType === 'equipment' && item.equipmentCategory === 'armor';
+}
+function isTool(item) {
+    return item.itemType === 'equipment' && item.equipmentCategory === 'tool';
+}
+function isGear(item) {
+    return item.itemType === 'equipment' && item.equipmentCategory === 'gear';
+}
+// -----------------------------------------------------------------------------
+// Helper Functions for Inventory Items
+// -----------------------------------------------------------------------------
+/**
+ * Calculate the GP value of a magic item by its rarity.
+ * Returns null for artifacts (priceless).
+ * Halves value for consumables except spell scrolls.
+ */
+function calculateMagicItemValue(item, isSpellScroll = false) {
+    const baseValue = exports.MAGIC_ITEM_RARITY_VALUES[item.rarity];
+    if (baseValue === null)
+        return null;
+    // Consumables are worth half, except spell scrolls
+    if (item.consumable && !isSpellScroll) {
+        return Math.floor(baseValue / 2);
+    }
+    return baseValue;
+}
+/**
+ * Calculate AC for a character wearing armor.
+ */
+function calculateArmorAC(armor, dexModifier, hasShield = false) {
+    let ac = armor.ac.base;
+    if (armor.ac.dexBonus === true) {
+        ac += dexModifier;
+    }
+    else if (armor.ac.dexBonus === 'max2') {
+        ac += Math.min(dexModifier, 2);
+    }
+    // If dexBonus is false or undefined, no Dex bonus
+    if (hasShield) {
+        ac += 2;
+    }
+    return ac;
 }

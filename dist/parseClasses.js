@@ -36,6 +36,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const types_1 = require("./types");
+// Simple unique ID generator
+let idCounter = 0;
+function generateId(prefix) {
+    return `${prefix}_${++idCounter}`;
+}
 // Mapping of class names
 const CLASS_NAME_MAP = {
     barbarian: 'barbarian',
@@ -170,6 +175,7 @@ function parseActionDamage(text) {
         const parsed = (0, types_1.parseDiceExpression)(diceStr);
         if (parsed && DAMAGE_TYPES.includes(typeStr)) {
             damages.push({
+                id: generateId('dmg'),
                 dice: parsed,
                 type: typeStr,
             });

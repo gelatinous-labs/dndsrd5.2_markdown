@@ -19,8 +19,15 @@ import {
   DamageInstance,
   DiceExpression,
   DieType,
+  MultiattackItem,
   parseDiceExpression,
 } from './types';
+
+// Simple unique ID generator for sub-items
+let uniqueIdCounter = 0;
+function generateUniqueId(prefix: string): string {
+  return `${prefix}_${++uniqueIdCounter}`;
+}
 
 // Mapping for skill names from markdown to our Skill type
 const SKILL_NAME_MAP: Record<string, Skill> = {
@@ -276,7 +283,7 @@ function parseSkills(skillsText: string): SkillProficiency[] {
     const skillName = match[1].trim().toLowerCase();
     const skill = SKILL_NAME_MAP[skillName];
     if (skill) {
-      skills.push({ skill });
+      skills.push({ id: generateUniqueId('skill'), skill });
     }
   }
 
@@ -374,6 +381,7 @@ function parseDamageFromText(text: string): DamageInstance[] {
     const parsed = parseDiceExpression(diceExpr);
     if (parsed && DAMAGE_TYPES.includes(typeStr as DamageType)) {
       damages.push({
+        id: generateUniqueId('dmg'),
         dice: parsed,
         type: typeStr as DamageType,
       });
@@ -389,7 +397,7 @@ function parseAction(name: string, description: string): Action {
   // Check for Multiattack
   if (name.toLowerCase() === 'multiattack') {
     // Try to parse attack counts from description
-    const attacks: { name: string; count: number }[] = [];
+    const attacks: MultiattackItem[] = [];
 
     // Pattern: "makes two Tentacle attacks" or "makes three Rend attacks"
     const multiPattern = /makes?\s+(two|three|four|five|\d+)\s+(\w+)\s+attacks?/gi;
@@ -408,11 +416,12 @@ function parseAction(name: string, description: string): Action {
         };
         count = countMap[countStr] || 1;
       }
-      attacks.push({ name: match[2], count });
+      attacks.push({ id: generateUniqueId('ma'), name: match[2], count });
     }
 
     return {
       actionType: 'multiattack',
+      id: generateUniqueId('action'),
       name,
       description,
       attacks,
@@ -455,6 +464,7 @@ function parseAction(name: string, description: string): Action {
 
     return {
       actionType: 'attack',
+      id: generateUniqueId('action'),
       name,
       description,
       attackType,
@@ -502,6 +512,7 @@ function parseAction(name: string, description: string): Action {
 
     return {
       actionType: 'ability',
+      id: generateUniqueId('action'),
       name: name.replace(/\s*\([^)]+\)\s*$/, '').trim(), // Remove recharge/usage from name
       description,
       savingThrow: { ability, dc },
@@ -514,13 +525,14 @@ function parseAction(name: string, description: string): Action {
   // Generic action (fallback)
   return {
     actionType: 'generic',
+    id: generateUniqueId('action'),
     name,
     description,
   };
 }
 
 function parseTrait(name: string, description: string): Trait {
-  return { name, description };
+  return { id: generateUniqueId('trait'), name, description };
 }
 
 function parseLegendaryAction(name: string, description: string): LegendaryAction {
@@ -533,6 +545,7 @@ function parseLegendaryAction(name: string, description: string): LegendaryActio
   }
 
   return {
+    id: generateUniqueId('la'),
     name: name.replace(/\s*\([^)]+\)\s*$/, '').trim(),
     description,
     cost,
@@ -691,7 +704,7 @@ function parseMonsterBlock(block: MonsterBlock): Monster | null {
           bonusActions.push(parseAction(currentItemName, desc));
           break;
         case 'reactions':
-          reactions.push({ name: currentItemName, description: desc });
+          reactions.push({ id: generateUniqueId('reaction'), name: currentItemName, description: desc });
           break;
         case 'legendary actions':
           legendaryActions.push(parseLegendaryAction(currentItemName, desc));
