@@ -28,16 +28,20 @@
     "attackType": "ranged",
     "damage": [
       {
+        "id": "dmg_1",
         "dice": {
           "count": 4,
-          "die": "d4"
+          "die": "d4",
+          "modifier": 0
         },
         "type": "acid"
       },
       {
+        "id": "dmg_2",
         "dice": {
           "count": 2,
-          "die": "d4"
+          "die": "d4",
+          "modifier": 0
         },
         "type": "acid"
       }
@@ -46,7 +50,8 @@
       "description": "** The damage (both initial and later) increases by 1d4 for each spell slot level above 2.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d4"
+        "die": "d4",
+        "modifier": 0
       }
     }
   },
@@ -79,9 +84,11 @@
     },
     "damage": [
       {
+        "id": "dmg_3",
         "dice": {
           "count": 1,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "acid"
       }
@@ -353,7 +360,8 @@
       "description": "** The creature's Slam damage increases by 1d4 (Medium or smaller), 1d6 (Large), or 1d12 (Huge) for each spell slot level above 5.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d4"
+        "die": "d4",
+        "modifier": 0
       }
     }
   },
@@ -515,9 +523,11 @@
     },
     "damage": [
       {
+        "id": "dmg_4",
         "dice": {
           "count": 5,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "force"
       }
@@ -526,7 +536,8 @@
       "description": "** The damage of the Clenched Fist increases by 2d8 and the damage of the Grasping Hand increases by 2d6 for each spell slot level above 5.",
       "damagePerLevel": {
         "count": 2,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -554,8 +565,7 @@
       }
     },
     "duration": {
-      "type": "untilDispelled",
-      "concentration": false
+      "type": "untilDispelled"
     },
     "description": "You touch a closed door, window, gate, container, or hatch and magically lock it for the duration. This lock can't be unlocked by any nonmagical means. You and any creatures you designate when you cast the spell can open and close the object despite the lock. You can also set a password that, when spoken within 5 feet of the object, unlocks it for 1 minute."
   },
@@ -646,8 +656,7 @@
       }
     },
     "duration": {
-      "type": "untilDispelled",
-      "concentration": false
+      "type": "untilDispelled"
     },
     "description": "You and up to eight willing creatures within range project your astral bodies into the Astral Plane (the spell ends instantly if you are already on that plane). Each target's body is left behind in a state of suspended animation; it has the Unconscious condition, doesn't need food or air, and doesn't age.\n\nA target's astral form resembles its body in almost every way, replicating its game statistics and possessions. The principal difference is the addition of a silvery cord that trails from between the shoulder blades of the astral form. The cord fades from view after 1 foot. If the cord is cut—which happens only when an effect states that it does so—the target's body and astral form both die.\n\nA target's astral form can travel through the Astral Plane. The moment an astral form leaves that plane, the target's body and possessions travel along the silver cord, causing the target to re-enter its body on the new plane.\n\nAny damage or other effects that apply to an astral form have no effect on the target's body and vice versa. If a target's body or astral form drops to 0 Hit Points, the spell ends for that target. The spell ends for all the targets if you take a Magic action to dismiss it.\n\nWhen the spell ends for a target who isn't dead, the target reappears in its body and exits the state of suspended animation."
   },
@@ -907,9 +916,11 @@
     },
     "damage": [
       {
+        "id": "dmg_5",
         "dice": {
           "count": 10,
-          "die": "d12"
+          "die": "d12",
+          "modifier": 0
         },
         "type": "psychic"
       }
@@ -945,9 +956,11 @@
     },
     "damage": [
       {
+        "id": "dmg_6",
         "dice": {
           "count": 1,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "necrotic"
       }
@@ -989,9 +1002,11 @@
     },
     "damage": [
       {
+        "id": "dmg_7",
         "dice": {
           "count": 3,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "bludgeoning"
       }
@@ -1028,9 +1043,11 @@
     },
     "damage": [
       {
+        "id": "dmg_8",
         "dice": {
           "count": 6,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "force"
       }
@@ -1102,9 +1119,11 @@
     },
     "damage": [
       {
+        "id": "dmg_9",
         "dice": {
           "count": 8,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "necrotic"
       }
@@ -1113,7 +1132,8 @@
       "description": "** The damage increases by 1d8 for each spell slot level above 4.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -1231,9 +1251,11 @@
     },
     "damage": [
       {
+        "id": "dmg_10",
         "dice": {
           "count": 3,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "fire"
       }
@@ -1246,7 +1268,8 @@
       "description": "** The damage increases by 1d6 for each spell slot level above 1.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d6"
+        "die": "d6",
+        "modifier": 0
       }
     }
   },
@@ -1281,9 +1304,11 @@
     },
     "damage": [
       {
+        "id": "dmg_11",
         "dice": {
           "count": 3,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "lightning"
       }
@@ -1292,7 +1317,8 @@
       "description": "** The damage increases by 1d10 for each spell slot level above 3.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d10"
+        "die": "d10",
+        "modifier": 0
       }
     }
   },
@@ -1363,9 +1389,11 @@
     },
     "damage": [
       {
+        "id": "dmg_12",
         "dice": {
           "count": 10,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "lightning"
       }
@@ -1473,9 +1501,11 @@
     "attackType": "melee",
     "damage": [
       {
+        "id": "dmg_13",
         "dice": {
           "count": 1,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "necrotic"
       }
@@ -1520,7 +1550,8 @@
       "description": "** The damage increases by 1d8 for each spell slot level above 1. The orb can leap a maximum number of times equal to the level of the slot expended, and a creature can be targeted only once by each casting of this spell.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -1560,9 +1591,11 @@
     },
     "damage": [
       {
+        "id": "dmg_14",
         "dice": {
           "count": 8,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "necrotic"
       }
@@ -1575,7 +1608,8 @@
       "description": "** The damage increases by 2d8 for each spell slot level above 6.",
       "damagePerLevel": {
         "count": 2,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -1674,9 +1708,11 @@
     },
     "damage": [
       {
+        "id": "dmg_15",
         "dice": {
           "count": 5,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "poison"
       }
@@ -1689,7 +1725,8 @@
       "description": "** The damage increases by 1d8 for each spell slot level above 5.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -1908,9 +1945,11 @@
     },
     "damage": [
       {
+        "id": "dmg_16",
         "dice": {
           "count": 8,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "cold"
       }
@@ -1923,7 +1962,8 @@
       "description": "** The damage increases by 1d8 for each spell slot level above 5.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -1999,9 +2039,11 @@
     },
     "damage": [
       {
+        "id": "dmg_17",
         "dice": {
           "count": 3,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "slashing"
       }
@@ -2010,7 +2052,8 @@
       "description": "** The damage increases by 1d10 for each spell slot level above 3.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d10"
+        "die": "d10",
+        "modifier": 0
       }
     }
   },
@@ -2045,9 +2088,11 @@
     },
     "damage": [
       {
+        "id": "dmg_18",
         "dice": {
           "count": 6,
-          "die": "d12"
+          "die": "d12",
+          "modifier": 0
         },
         "type": "radiant"
       }
@@ -2056,7 +2101,8 @@
       "description": "** The healing and damage increase by 1d12 for each spell slot level above 7.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d12"
+        "die": "d12",
+        "modifier": 0
       }
     }
   },
@@ -2094,7 +2140,8 @@
       "description": "** The damage increases by 1d8 for each spell slot level above 5.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -2127,7 +2174,8 @@
       "description": "** The damage increases by 1d12 for each spell slot level above 6.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d12"
+        "die": "d12",
+        "modifier": 0
       }
     }
   },
@@ -2163,7 +2211,8 @@
       "description": "** The damage increases by 1d8 for each spell slot level above 4.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -2198,9 +2247,11 @@
     },
     "damage": [
       {
+        "id": "dmg_19",
         "dice": {
           "count": 5,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "force"
       }
@@ -2213,7 +2264,8 @@
       "description": "** The damage increases by 1d8 for each spell slot level above 4.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -2250,9 +2302,11 @@
     },
     "damage": [
       {
+        "id": "dmg_20",
         "dice": {
           "count": 6,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "psychic"
       }
@@ -2287,9 +2341,11 @@
     },
     "damage": [
       {
+        "id": "dmg_21",
         "dice": {
           "count": 11,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "necrotic"
       }
@@ -2350,8 +2406,7 @@
       }
     },
     "duration": {
-      "type": "untilDispelled",
-      "concentration": false
+      "type": "untilDispelled"
     },
     "description": "A flame springs from an object that you touch. The effect casts Bright Light in a 20-foot radius and Dim Light for an additional 20 feet. It looks like a regular flame, but it creates no heat and consumes no fuel. The flame can be covered or hidden but not smothered or quenched."
   },
@@ -2391,9 +2446,11 @@
     },
     "damage": [
       {
+        "id": "dmg_22",
         "dice": {
           "count": 2,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "bludgeoning"
       }
@@ -2623,7 +2680,8 @@
       "description": "** The healing increases by 2d8 for each spell slot level above 1.",
       "damagePerLevel": {
         "count": 2,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -2820,7 +2878,8 @@
       "description": "** The base damage increases by 1d6 for each spell slot level above 7.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d6"
+        "die": "d6",
+        "modifier": 0
       }
     }
   },
@@ -3001,9 +3060,11 @@
     "description": "You teleport to a location within range. You arrive at exactly the spot desired. It can be a place you can see, one you can visualize, or one you can describe by stating distance and direction, such as \"200 feet straight downward\" or \"300 feet upward to the northwest at a 45-degree angle.\"\n\nYou can also teleport one willing creature. The creature must be within 5 feet of you when you teleport, and it teleports to a space within 5 feet of your destination space.\n\nIf you, the other creature, or both would arrive in a space occupied by a creature or completely filled by one or more objects, you and any creature traveling with you each take 4d6 Force damage, and the teleportation fails.",
     "damage": [
       {
+        "id": "dmg_23",
         "dice": {
           "count": 4,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "force"
       }
@@ -3068,6 +3129,7 @@
     },
     "damage": [
       {
+        "id": "dmg_24",
         "dice": {
           "count": 10,
           "die": "d6",
@@ -3080,7 +3142,8 @@
       "description": "** The damage increases by 3d6 for each spell slot level above 6.",
       "damagePerLevel": {
         "count": 3,
-        "die": "d6"
+        "die": "d6",
+        "modifier": 0
       }
     }
   },
@@ -3179,9 +3242,11 @@
     },
     "damage": [
       {
+        "id": "dmg_25",
         "dice": {
           "count": 3,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "psychic"
       }
@@ -3190,7 +3255,8 @@
       "description": "** The damage increases by 1d6 for each spell slot level above 1.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d6"
+        "die": "d6",
+        "modifier": 0
       }
     }
   },
@@ -3250,9 +3316,11 @@
     "description": "Until the spell ends, your attacks with weapons deal an extra 1d4 Radiant damage on a hit.",
     "damage": [
       {
+        "id": "dmg_26",
         "dice": {
           "count": 1,
-          "die": "d4"
+          "die": "d4",
+          "modifier": 0
         },
         "type": "radiant"
       }
@@ -3283,9 +3351,11 @@
     "description": "The target takes an extra 2d8 Radiant damage from the attack. The damage increases by 1d8 if the target is a Fiend or an Undead.\n\n**_Using a Higher-Level Spell Slot._** The damage increases by 1d8 for each spell slot level above 1.",
     "damage": [
       {
+        "id": "dmg_27",
         "dice": {
           "count": 2,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "radiant"
       }
@@ -3294,7 +3364,8 @@
       "description": "** The damage increases by 1d8 for each spell slot level above 1.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -3466,7 +3537,8 @@
       "description": "** The damage increases by 1d6 for each spell slot level above 2.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d6"
+        "die": "d6",
+        "modifier": 0
       }
     }
   },
@@ -3506,9 +3578,11 @@
     },
     "damage": [
       {
+        "id": "dmg_28",
         "dice": {
           "count": 3,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "psychic"
       }
@@ -3578,9 +3652,11 @@
     },
     "damage": [
       {
+        "id": "dmg_29",
         "dice": {
           "count": 12,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "bludgeoning"
       }
@@ -3612,9 +3688,11 @@
     "attackType": "ranged",
     "damage": [
       {
+        "id": "dmg_30",
         "dice": {
           "count": 1,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "force"
       }
@@ -3759,9 +3837,11 @@
     },
     "damage": [
       {
+        "id": "dmg_31",
         "dice": {
           "count": 1,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "piercing"
       }
@@ -3770,7 +3850,8 @@
       "description": "** The damage increases by 1d6 for each spell slot level above 1.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d6"
+        "die": "d6",
+        "modifier": 0
       }
     }
   },
@@ -4017,9 +4098,11 @@
     },
     "damage": [
       {
+        "id": "dmg_32",
         "dice": {
           "count": 4,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "force"
       }
@@ -4272,6 +4355,7 @@
     },
     "damage": [
       {
+        "id": "dmg_33",
         "dice": {
           "count": 7,
           "die": "d8",
@@ -4315,9 +4399,11 @@
     },
     "damage": [
       {
+        "id": "dmg_34",
         "dice": {
           "count": 8,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "fire"
       }
@@ -4330,7 +4416,8 @@
       "description": "** The damage increases by 1d6 for each spell slot level above 3.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d6"
+        "die": "d6",
+        "modifier": 0
       }
     }
   },
@@ -4361,9 +4448,11 @@
     "attackType": "ranged",
     "damage": [
       {
+        "id": "dmg_35",
         "dice": {
           "count": 1,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "fire"
       }
@@ -4405,16 +4494,20 @@
     "description": "Wispy flames wreathe your body for the duration, shedding Bright Light in a 10-foot radius and Dim Light for an additional 10 feet.\n\nThe flames provide you with a warm shield or a chill shield, as you choose. The warm shield grants you Resistance to Cold damage, and the chill shield grants you Resistance to Fire damage.\n\nIn addition, whenever a creature within 5 feet of you hits you with a melee attack roll, the shield erupts with flame. The attacker takes 2d8 Fire damage from a warm shield or 2d8 Cold damage from a chill shield.",
     "damage": [
       {
+        "id": "dmg_36",
         "dice": {
           "count": 2,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "fire"
       },
       {
+        "id": "dmg_37",
         "dice": {
           "count": 2,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "cold"
       }
@@ -4452,9 +4545,11 @@
     },
     "damage": [
       {
+        "id": "dmg_38",
         "dice": {
           "count": 7,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "fire"
       }
@@ -4496,7 +4591,8 @@
       "description": "** The damage increases by 1d6 for each spell slot level above 2.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d6"
+        "die": "d6",
+        "modifier": 0
       }
     }
   },
@@ -4533,16 +4629,20 @@
     },
     "damage": [
       {
+        "id": "dmg_39",
         "dice": {
           "count": 5,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "fire"
       },
       {
+        "id": "dmg_40",
         "dice": {
           "count": 5,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "radiant"
       }
@@ -4551,7 +4651,8 @@
       "description": "** The Fire damage and the Radiant damage increase by 1d6 for each spell slot level above 5.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d6"
+        "die": "d6",
+        "modifier": 0
       }
     }
   },
@@ -4591,9 +4692,11 @@
     },
     "damage": [
       {
+        "id": "dmg_41",
         "dice": {
           "count": 2,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "fire"
       }
@@ -4602,7 +4705,8 @@
       "description": "** The damage increases by 1d6 for each spell slot level above 2.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d6"
+        "die": "d6",
+        "modifier": 0
       }
     }
   },
@@ -4861,9 +4965,11 @@
     },
     "damage": [
       {
+        "id": "dmg_42",
         "dice": {
           "count": 10,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "cold"
       }
@@ -4977,9 +5083,11 @@
     },
     "damage": [
       {
+        "id": "dmg_43",
         "dice": {
           "count": 5,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "psychic"
       }
@@ -5131,8 +5239,7 @@
       }
     },
     "duration": {
-      "type": "untilDispelled",
-      "concentration": false
+      "type": "untilDispelled"
     },
     "description": "You inscribe a glyph that later unleashes a magical effect. You inscribe it either on a surface (such as a table or a section of floor) or within an object that can be closed (such as a book or chest) to conceal the glyph. The glyph can cover an area no larger than 10 feet in diameter. If the surface or object is moved more than 10 feet from where you cast this spell, the glyph is broken, and the spell ends without being triggered.\n\nThe glyph is nearly imperceptible and requires a successful Wisdom (Perception) check against your spell save DC to notice.\n\nWhen you inscribe the glyph, you set its trigger and choose whether it's an explosive rune or a spell glyph, as explained below.\n\n**_Set the Trigger._** You decide what triggers the glyph when you cast the spell. For glyphs inscribed on a surface, common triggers include touching or stepping on the glyph, removing another object covering it, or approaching within a certain distance of it. For glyphs inscribed within an object, common triggers include opening that object or seeing the glyph. Once a glyph is triggered, this spell ends.\n\nYou can refine the trigger so that only creatures of certain types activate it (for example, the glyph could be set to affect Aberrations). You can also set conditions for creatures that don't trigger the glyph, such as those who say a certain password.\n\n**_Explosive Rune._** When triggered, the glyph erupts with magical energy in a 20-foot-radius Sphere centered on the glyph. Each creature in the area makes a Dexterity saving throw. A creature takes 5d8 Acid, Cold, Fire, Lightning, or Thunder damage (your choice when you create the glyph) on a failed save or half as much damage on a successful one.\n\n**_Spell Glyph._** You can store a prepared spell of level 3 or lower in the glyph by casting it as part of creating the glyph. The spell must target a single creature or an area. The spell being stored has no immediate effect when cast in this way.\n\nWhen the glyph is triggered, the stored spell takes effect. If the spell has a target, it targets the creature that triggered the glyph. If the spell affects an area, the area is centered on that creature. If the spell summons Hostile creatures or creates harmful objects or traps, they appear as close as possible to the intruder and attack it. If the spell requires Concentration, it lasts until the end of its full duration.\n\n**_Using a Higher-Level Spell Slot._** The damage of an explosive rune increases by 1d8 for each spell slot level above 3. If you create a spell glyph, you can store any spell of up to the same level as the spell slot you use for the *Glyph of Warding*.",
     "savingThrow": {
@@ -5148,7 +5255,8 @@
       "description": "** The damage of an explosive rune increases by 1d8 for each spell slot level above 3. If you create a spell glyph, you can store any spell of up to the same level as the spell slot you use for the *Glyph of Warding*.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -5383,9 +5491,11 @@
     "attackType": "ranged",
     "damage": [
       {
+        "id": "dmg_44",
         "dice": {
           "count": 4,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "radiant"
       }
@@ -5394,7 +5504,8 @@
       "description": "** The damage increases by 1d6 for each spell slot level above 1.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d6"
+        "die": "d6",
+        "modifier": 0
       }
     }
   },
@@ -5456,8 +5567,7 @@
       }
     },
     "duration": {
-      "type": "untilDispelled",
-      "concentration": false
+      "type": "untilDispelled"
     },
     "description": "You touch a point and infuse an area around it with holy or unholy power. The area can have a radius up to 60 feet, and the spell fails if the radius includes an area already under the effect of *Hallow*. The affected area has the following effects.\n\n**_Hallowed Ward._** Choose any of these creature types: Aberration, Celestial, Elemental, Fey, Fiend, or Undead. Creatures of the chosen types can't willingly enter the area, and any creature that is possessed by or that has the Charmed or Frightened condition from such creatures isn't possessed, Charmed, or Frightened by them while in the area.\n\n**_Extra Effect._** You bind an extra effect to the area from the list below:\n\n**_Courage._** Creatures of any types you choose can't gain the Frightened condition while in the area.\n\n**_Darkness._** Darkness fills the area. Normal light, as well as magical light created by spells of a level lower than this spell, can't illuminate the area.\n\n**_Daylight._** Bright light fills the area. Magical Darkness created by spells of a level lower than this spell can't extinguish the light.\n\n**_Peaceful Rest._** Dead bodies interred in the area can't be turned into Undead.\n\n**_Extradimensional Interference._** Creatures of any types you choose can't enter or exit the area using teleportation or interplanar travel.\n\n**_Fear._** Creatures of any types you choose have the Frightened condition while in the area.\n\n**_Resistance._** Creatures of any types you choose have Resistance to one damage type of your choice while in the area.\n\n**_Silence._** No sound can emanate from within the area, and no sound can reach into it.\n\n**_Tongues._** Creatures of any types you choose can communicate with any other creature in the area even if they don't share a common language.\n\n**_Vulnerability._** Creatures of any types you choose have Vulnerability to one damage type of your choice while in the area."
   },
@@ -5528,9 +5638,11 @@
     },
     "damage": [
       {
+        "id": "dmg_45",
         "dice": {
           "count": 14,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "necrotic"
       }
@@ -5625,7 +5737,8 @@
       "description": "** The healing increases by 2d4 for each spell slot level above 1.",
       "damagePerLevel": {
         "count": 2,
-        "die": "d4"
+        "die": "d4",
+        "modifier": 0
       }
     }
   },
@@ -5662,9 +5775,11 @@
     },
     "damage": [
       {
+        "id": "dmg_46",
         "dice": {
           "count": 2,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "fire"
       }
@@ -5673,7 +5788,8 @@
       "description": "** The damage increases by 1d8 for each spell slot level above 2.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -5708,9 +5824,11 @@
     },
     "damage": [
       {
+        "id": "dmg_47",
         "dice": {
           "count": 2,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "fire"
       }
@@ -5719,7 +5837,8 @@
       "description": "** The damage increases by 1d10 for each spell slot level above 1.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d10"
+        "die": "d10",
+        "modifier": 0
       }
     }
   },
@@ -5815,9 +5934,11 @@
     "description": "You place a curse on a creature that you can see within range. Until the spell ends, you deal an extra 1d6 Necrotic damage to the target whenever you hit it with an attack roll. Also, choose one ability when you cast the spell. The target has Disadvantage on ability checks made with the chosen ability.\n\nIf the target drops to 0 Hit Points before this spell ends, you can take a Bonus Action on a later turn to curse a new creature.\n\n**_Using a Higher-Level Spell Slot._** Your Concentration can last longer with a spell slot of level 2 (up to 4 hours), 3–4 (up to 8 hours), or 5+ (24 hours).",
     "damage": [
       {
+        "id": "dmg_48",
         "dice": {
           "count": 1,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "necrotic"
       }
@@ -6000,9 +6121,11 @@
     "description": "You magically mark one creature you can see within range as your quarry. Until the spell ends, you deal an extra 1d6 Force damage to the target whenever you hit it with an attack roll. You also have Advantage on any Wisdom (Perception or Survival) check you make to find it.\n\nIf the target drops to 0 Hit Points before this spell ends, you can take a Bonus Action to move the mark to a new creature you can see within range.\n\n**_Using a Higher-Level Spell Slot._** Your Concentration can last longer with a spell slot of level 3–4 (up to 8 hours) or 5+ (up to 24 hours).",
     "damage": [
       {
+        "id": "dmg_49",
         "dice": {
           "count": 1,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "force"
       }
@@ -6083,16 +6206,20 @@
     },
     "damage": [
       {
+        "id": "dmg_50",
         "dice": {
           "count": 1,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "piercing"
       },
       {
+        "id": "dmg_51",
         "dice": {
           "count": 2,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "cold"
       }
@@ -6101,7 +6228,8 @@
       "description": "** The Cold damage increases by 1d6 for each spell slot level above 1.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d6"
+        "die": "d6",
+        "modifier": 0
       }
     }
   },
@@ -6140,16 +6268,20 @@
     },
     "damage": [
       {
+        "id": "dmg_52",
         "dice": {
           "count": 2,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "bludgeoning"
       },
       {
+        "id": "dmg_53",
         "dice": {
           "count": 4,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "cold"
       }
@@ -6158,7 +6290,8 @@
       "description": "** The Bludgeoning damage increases by 1d10 for each spell slot level above 4.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d10"
+        "die": "d10",
+        "modifier": 0
       }
     }
   },
@@ -6251,8 +6384,7 @@
       }
     },
     "duration": {
-      "type": "untilDispelled",
-      "concentration": false
+      "type": "untilDispelled"
     },
     "description": "You create a magical restraint to hold a creature that you can see within range. The target must make a Wisdom saving throw. On a successful save, the target is unaffected, and it is immune to this\n\nspell for the next 24 hours. On a failed save, the target is imprisoned. While imprisoned, the target doesn't need to breathe, eat, or drink, and it doesn't age. Divination spells can't locate or perceive the imprisoned target, and the target can't teleport.\n\nUntil the spell ends, the target is also affected by one of the following effects of your choice:\n\n**Burial.** The target is entombed beneath the earth in a hollow globe of magical force that is just large enough to contain the target. Nothing can pass into or out of the globe.\n**Chaining.** Chains firmly rooted in the ground hold the target in place. The target has the Restrained condition and can't be moved by any means.\n**Hedged Prison.** The target is trapped in a demiplane that is warded against teleportation and planar travel. The demiplane is your choice of a labyrinth, a cage, a tower, or the like.\n**Minimus Containment.** The target becomes 1 inch tall and is trapped inside an indestructible gemstone or a similar object. Light can pass through the gemstone (allowing the target to see out and other creatures to see in), but nothing else can pass through by any means.\n**Slumber.** The target has the Unconscious condition and can't be awoken.\n\n**_Ending the Spell._** When you cast the spell, specify a trigger that will end it. The trigger can be as simple or as elaborate as you choose, but the GM must agree that it has a high likelihood of happening within the next decade. The trigger must be an observable action, such as someone making a particular offering at the temple of your god, saving your true love, or defeating a specific monster.\n\nA *Dispel Magic* spell can end the spell only if it is cast with a level 9 spell slot, targeting either the prison or the component used to create it.",
     "savingThrow": {
@@ -6294,9 +6426,11 @@
     },
     "damage": [
       {
+        "id": "dmg_54",
         "dice": {
           "count": 10,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "fire"
       }
@@ -6335,9 +6469,11 @@
     },
     "damage": [
       {
+        "id": "dmg_55",
         "dice": {
           "count": 2,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "necrotic"
       }
@@ -6346,7 +6482,8 @@
       "description": "** The damage increases by 1d10 for each spell slot level above 1.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d10"
+        "die": "d10",
+        "modifier": 0
       }
     }
   },
@@ -6386,9 +6523,11 @@
     },
     "damage": [
       {
+        "id": "dmg_56",
         "dice": {
           "count": 4,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "piercing"
       }
@@ -6401,7 +6540,8 @@
       "description": "** The damage increases by 1d10 for each spell slot level above 5.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d10"
+        "die": "d10",
+        "modifier": 0
       }
     }
   },
@@ -6429,8 +6569,7 @@
       }
     },
     "duration": {
-      "type": "untilDispelled",
-      "concentration": false
+      "type": "untilDispelled"
     },
     "description": "You touch the sapphire used in the casting and an object weighing 10 pounds or less whose longest dimension is 6 feet or less. The spell leaves an Invisible mark on that object and invisibly inscribes the object's name on the sapphire. Each time you cast this spell, you must use a different sapphire.\n\nThereafter, you can take a Magic action to speak the object's name and crush the sapphire. The object instantly appears in your hand regardless of physical or planar distances, and the spell ends.\n\nIf another creature is holding or carrying the object, crushing the sapphire doesn't transport it, but instead you learn who that creature is and where that creature is currently located."
   },
@@ -6712,9 +6851,11 @@
     },
     "damage": [
       {
+        "id": "dmg_57",
         "dice": {
           "count": 8,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "lightning"
       }
@@ -6728,7 +6869,8 @@
       "description": "** The damage increases by 1d6 for each spell slot level above 3.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d6"
+        "die": "d6",
+        "modifier": 0
       }
     }
   },
@@ -6980,8 +7122,7 @@
       }
     },
     "duration": {
-      "type": "untilDispelled",
-      "concentration": false
+      "type": "untilDispelled"
     },
     "description": "Your body falls into a catatonic state as your soul leaves it and enters the container you used for the spell's Material component. While your soul inhabits the container, you are aware of your surroundings as if you were in the container's space. You can't move or take Reactions. The only action you can take is to project your soul up to 100 feet out of the container, either returning to your living body (and ending the spell) or attempting to possess a Humanoid's body.\n\nYou can attempt to possess any Humanoid within 100 feet of you that you can see (creatures warded by a *Protection from Evil and Good* or *Magic Circle* spell can't be possessed). The target makes a Charisma saving throw. On a failed save, your soul enters the target's body, and the target's soul becomes trapped in the container. On a successful save, the target resists your efforts to possess it, and you can't attempt to possess it again for 24 hours.\n\nOnce you possess a creature's body, you control it. Your Hit Points, Hit Point Dice, Strength, Dexterity, Constitution, Speed, and senses are replaced by the creature's. You otherwise keep your game statistics.\n\nMeanwhile, the possessed creature's soul can perceive from the container using its own senses, but it can't move and it is Incapacitated.\n\nWhile possessing a body, you can take a Magic action to return from the host body to the container if it is within 100 feet of you, returning the host creature's soul to its body. If the host body dies while you're in it, the creature dies, and you make a Charisma saving throw against your own spellcasting DC. On a success, you return to the container if it is within 100 feet of you. Otherwise, you die.\n\nIf the container is destroyed or the spell ends, your soul returns to your body. If your body is more than 100 feet away from you or if your body is dead, you die. If another creature's soul is in the container when it is destroyed, the creature's soul returns to its body if the body is alive and within 100 feet. Otherwise, that creature dies.\n\nWhen the spell ends, the container is destroyed.",
     "savingThrow": {
@@ -7016,6 +7157,7 @@
     "description": "You create three glowing darts of magical force. Each dart strikes a creature of your choice that you can see within range. A dart deals 1d4 + 1 Force damage to its target. The darts all strike simultaneously, and you can direct them to hit one creature or several.\n\n**_Using a Higher-Level Spell Slot._** The spell creates one more dart for each spell slot level above 1.",
     "damage": [
       {
+        "id": "dmg_58",
         "dice": {
           "count": 1,
           "die": "d4",
@@ -7056,8 +7198,7 @@
       }
     },
     "duration": {
-      "type": "untilDispelled",
-      "concentration": false
+      "type": "untilDispelled"
     },
     "description": "You implant a message within an object in range—a message that is uttered when a trigger condition is met. Choose an object that you can see and that isn't being worn or carried by another creature. Then speak the message, which must be 25 words or fewer, though it can be delivered over as long as 10 minutes. Finally, determine the circumstance that will trigger the spell to deliver your message.\n\nWhen that trigger occurs, a magical mouth appears on the object and recites the message in your voice and at the same volume you spoke. If the object you chose has a mouth or something that looks like a mouth (for example, the mouth of a statue), the magical mouth appears there, so the words appear to come from the object's mouth. When you cast this spell, you can have the spell end after it delivers its message, or it can remain and repeat its message whenever the trigger occurs.\n\nThe trigger can be as general or as detailed as you like, though it must be based on visual or audible conditions that occur within 30 feet of the object. For example, you could instruct the mouth to speak when any creature moves within 30 feet of the object or when a silver bell rings within 30 feet of it."
   },
@@ -7198,7 +7339,8 @@
       "description": "** The healing increases by 1d8 for each spell slot level above 5.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -7254,7 +7396,8 @@
       "description": "** The healing increases by 1d4 for each spell slot level above 3.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d4"
+        "die": "d4",
+        "modifier": 0
       }
     }
   },
@@ -7347,9 +7490,11 @@
     "description": "You step into a stone object or surface large enough to fully contain your body, merging yourself and your equipment with the stone for the duration. You must touch the stone to do so. Nothing of your presence remains visible or otherwise detectable by nonmagical senses.\n\nWhile merged with the stone, you can't see what occurs outside it, and any Wisdom (Perception) checks you make to hear sounds outside it are made with Disadvantage. You remain aware of the passage of time and can cast spells on yourself while merged in the stone. You can use 5 feet of movement to leave the stone where you entered it, which ends the spell. You otherwise can't move.\n\nMinor physical damage to the stone doesn't harm you, but its partial destruction or a change in its shape (to the extent that you no longer fit within it) expels you and deals 6d6 Force damage to you. The stone's complete destruction (or transmutation into a different substance) expels you and deals 50 Force damage to you. If expelled, you move into an unoccupied space closest to where you first entered and have the Prone condition.",
     "damage": [
       {
+        "id": "dmg_59",
         "dice": {
           "count": 6,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "force"
       }
@@ -7449,16 +7594,20 @@
     },
     "damage": [
       {
+        "id": "dmg_60",
         "dice": {
           "count": 20,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "fire"
       },
       {
+        "id": "dmg_61",
         "dice": {
           "count": 20,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "bludgeoning"
       }
@@ -7526,9 +7675,11 @@
     },
     "damage": [
       {
+        "id": "dmg_62",
         "dice": {
           "count": 3,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "psychic"
       }
@@ -7537,7 +7688,8 @@
       "description": "** The damage increases by 1d8 for each spell slot level above 2.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -7749,9 +7901,11 @@
     },
     "damage": [
       {
+        "id": "dmg_63",
         "dice": {
           "count": 2,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "radiant"
       }
@@ -7760,7 +7914,8 @@
       "description": "** The damage increases by 1d10 for each spell slot level above 2.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d10"
+        "die": "d10",
+        "modifier": 0
       }
     }
   },
@@ -7920,9 +8075,11 @@
     },
     "damage": [
       {
+        "id": "dmg_64",
         "dice": {
           "count": 2,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "psychic"
       }
@@ -7964,9 +8121,11 @@
     },
     "damage": [
       {
+        "id": "dmg_65",
         "dice": {
           "count": 4,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "psychic"
       }
@@ -7975,7 +8134,8 @@
       "description": "** The damage increases by 1d10 for each spell slot level above 4.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d10"
+        "die": "d10",
+        "modifier": 0
       }
     }
   },
@@ -8165,9 +8325,11 @@
     "attackType": "ranged",
     "damage": [
       {
+        "id": "dmg_66",
         "dice": {
           "count": 1,
-          "die": "d12"
+          "die": "d12",
+          "modifier": 0
         },
         "type": "poison"
       }
@@ -8266,9 +8428,11 @@
     "description": "You compel one creature you can see within range to die. If the target has 100 Hit Points or fewer, it dies. Otherwise, it takes 12d12 Psychic damage.",
     "damage": [
       {
+        "id": "dmg_67",
         "dice": {
           "count": 12,
-          "die": "d12"
+          "die": "d12",
+          "modifier": 0
         },
         "type": "psychic"
       }
@@ -8332,13 +8496,15 @@
     "description": "Up to five creatures of your choice who remain within range for the spell's entire casting gain the benefits of a Short Rest and also regain 2d8 Hit Points. A creature can't be affected by this spell again until that creature finishes a Long Rest.\n\n**_Using a Higher-Level Spell Slot._** The healing increases by 1d8 for each spell slot level above 2.",
     "healing": {
       "count": 2,
-      "die": "d8"
+      "die": "d8",
+      "modifier": 0
     },
     "higherLevelScaling": {
       "description": "** The healing increases by 1d8 for each spell slot level above 2.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -8401,37 +8567,47 @@
     },
     "damage": [
       {
+        "id": "dmg_68",
         "dice": {
           "count": 12,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "fire"
       },
       {
+        "id": "dmg_69",
         "dice": {
           "count": 12,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "acid"
       },
       {
+        "id": "dmg_70",
         "dice": {
           "count": 12,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "lightning"
       },
       {
+        "id": "dmg_71",
         "dice": {
           "count": 12,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "poison"
       },
       {
+        "id": "dmg_72",
         "dice": {
           "count": 12,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "cold"
       }
@@ -8473,37 +8649,47 @@
     },
     "damage": [
       {
+        "id": "dmg_73",
         "dice": {
           "count": 12,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "fire"
       },
       {
+        "id": "dmg_74",
         "dice": {
           "count": 12,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "acid"
       },
       {
+        "id": "dmg_75",
         "dice": {
           "count": 12,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "lightning"
       },
       {
+        "id": "dmg_76",
         "dice": {
           "count": 12,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "poison"
       },
       {
+        "id": "dmg_77",
         "dice": {
           "count": 12,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "cold"
       }
@@ -8568,9 +8754,11 @@
     "attackType": "ranged",
     "damage": [
       {
+        "id": "dmg_78",
         "dice": {
           "count": 1,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "fire"
       }
@@ -8607,8 +8795,7 @@
       }
     },
     "duration": {
-      "type": "untilDispelled",
-      "concentration": false
+      "type": "untilDispelled"
     },
     "description": "You create an illusion of an object, a creature, or some other visible phenomenon within range that activates when a specific trigger occurs. The illusion is imperceptible until then. It must be no larger than a 30-foot Cube, and you decide when you cast the spell how the illusion behaves and what sounds it makes. This scripted performance can last up to 5 minutes.\n\nWhen the trigger you specify occurs, the illusion springs into existence and performs in the manner you described. Once the illusion finishes performing, it disappears and remains dormant for 10 minutes, after which the illusion can be activated again.\n\nThe trigger can be as general or as detailed as you like, though it must be based on visual or audible phenomena that occur within 30 feet of the area. For example, you could create an illusion of yourself to appear and warn off others who attempt to open a trapped door.\n\nPhysical interaction with the image reveals it to be illusory, since things can pass through it. A creature that takes the Study action to examine the image can determine that it is an illusion with a successful Intelligence (Investigation) check against your spell save DC. If a creature discerns the illusion for what it is, the creature can see through the image, and any noise it makes sounds hollow to the creature.",
     "areaOfEffect": {
@@ -8855,9 +9042,11 @@
     "attackType": "ranged",
     "damage": [
       {
+        "id": "dmg_79",
         "dice": {
           "count": 1,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "cold"
       }
@@ -8932,9 +9121,11 @@
     "attackType": "ranged",
     "damage": [
       {
+        "id": "dmg_80",
         "dice": {
           "count": 2,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "poison"
       }
@@ -8943,7 +9134,8 @@
       "description": "** The damage increases by 1d8 for each spell slot level above 1.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -9207,9 +9399,11 @@
     },
     "damage": [
       {
+        "id": "dmg_81",
         "dice": {
           "count": 1,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "radiant"
       }
@@ -9279,9 +9473,11 @@
     "attackType": "ranged",
     "damage": [
       {
+        "id": "dmg_82",
         "dice": {
           "count": 2,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "fire"
       }
@@ -9359,16 +9555,20 @@
     },
     "damage": [
       {
+        "id": "dmg_83",
         "dice": {
           "count": 1,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "fire"
       },
       {
+        "id": "dmg_84",
         "dice": {
           "count": 1,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "fire"
       }
@@ -9377,7 +9577,8 @@
       "description": "** All the damage increases by 1d6 for each spell slot level above 1.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d6"
+        "die": "d6",
+        "modifier": 0
       }
     }
   },
@@ -9404,8 +9605,7 @@
       }
     },
     "duration": {
-      "type": "untilDispelled",
-      "concentration": false
+      "type": "untilDispelled"
     },
     "description": "You hide a chest and all its contents on the Ethereal Plane. You must touch the chest and the miniature replica that serve as Material components for the spell. The chest can contain up to 12 cubic feet of nonliving material (3 feet by 2 feet by 2 feet).\n\nWhile the chest remains on the Ethereal Plane, you can take a Magic action and touch the replica to recall the chest. It appears in an unoccupied space on the ground within 5 feet of you. You can send the chest back to the Ethereal Plane by taking a Magic action to touch the chest and the replica.\n\nAfter 60 days, there is a cumulative 5 percent chance at the end of each day that the spell ends. The spell also ends if you cast this spell again or if the Tiny replica chest is destroyed. If the spell ends and the larger chest is on the Ethereal Plane, the chest remains there for you or someone else to find."
   },
@@ -9519,8 +9719,7 @@
       }
     },
     "duration": {
-      "type": "untilDispelled",
-      "concentration": false
+      "type": "untilDispelled"
     },
     "description": "With a touch, you magically sequester an object or a willing creature. For the duration, the target has the Invisible condition and can't be targeted by Divination spells, detected by magic, or viewed remotely with magic.\n\nIf the target is a creature, it enters a state of suspended animation; it has the Unconscious condition, doesn't age, and doesn't need food, water, or air.\n\nYou can set a condition for the spell to end early. The condition can be anything you choose, but it must occur or be visible within 1 mile of the target. Examples include \"after 1,000 years\" or \"when the tarrasque awakens.\" This spell also ends if the target takes any damage."
   },
@@ -9587,9 +9786,11 @@
     },
     "damage": [
       {
+        "id": "dmg_85",
         "dice": {
           "count": 3,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "thunder"
       }
@@ -9602,7 +9803,8 @@
       "description": "** The damage increases by 1d8 for each spell slot level above 2.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -9720,9 +9922,11 @@
     "description": "The target hit by the strike takes an extra 2d6 Radiant damage from the attack. Until the spell ends, the target sheds Bright Light in a 5-foot radius, attack rolls against it have Advantage, and it can't benefit from the Invisible condition.\n\n**_Using a Higher-Level Spell Slot._** The damage increases by 1d6 for each spell slot level above 2.",
     "damage": [
       {
+        "id": "dmg_86",
         "dice": {
           "count": 2,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "radiant"
       }
@@ -9731,7 +9935,8 @@
       "description": "** The damage increases by 1d6 for each spell slot level above 2.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d6"
+        "die": "d6",
+        "modifier": 0
       }
     }
   },
@@ -9761,9 +9966,11 @@
     "attackType": "melee",
     "damage": [
       {
+        "id": "dmg_87",
         "dice": {
           "count": 1,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "lightning"
       }
@@ -9866,8 +10073,7 @@
       }
     },
     "duration": {
-      "type": "untilDispelled",
-      "concentration": false
+      "type": "untilDispelled"
     },
     "description": "You create a simulacrum of one Beast or Humanoid that is within 10 feet of you for the entire casting of the spell. You finish the casting by touching both the creature and a pile of ice or snow that is the same size as that creature, and the pile turns into the simulacrum, which is a creature. It uses the game statistics of the original creature at the time of casting, except it is a Construct, its Hit Point maximum is half as much, and it can't cast this spell.\n\nThe simulacrum is Friendly to you and creatures you designate. It obeys your commands and acts on your turn in combat. The simulacrum can't gain levels, and it can't take Short or Long Rests.\n\nIf the simulacrum takes damage, the only way to restore its Hit Points is to repair it as you take a Long Rest, during which you expend components worth 100 GP per Hit Point restored. The simulacrum must stay within 5 feet of you for the repair.\n\nThe simulacrum lasts until it drops to 0 Hit Points, at which point it reverts to snow and melts away. If you cast this spell again, any simulacrum you created with this spell is instantly destroyed."
   },
@@ -10194,9 +10400,11 @@
     "description": "The ground in a 20-foot-radius Sphere centered on a point within range sprouts hard spikes and thorns. The area becomes Difficult Terrain for the duration. When a creature moves into or within the area, it takes 2d4 Piercing damage for every 5 feet it travels.\n\nThe transformation of the ground is camouflaged to look natural. Any creature that can't see the area when the spell is cast must take a Search action and succeed on a Wisdom (Perception or Survival) check against your spell save DC to recognize the terrain as hazardous before entering it.",
     "damage": [
       {
+        "id": "dmg_88",
         "dice": {
           "count": 2,
-          "die": "d4"
+          "die": "d4",
+          "modifier": 0
         },
         "type": "piercing"
       }
@@ -10239,16 +10447,20 @@
     },
     "damage": [
       {
+        "id": "dmg_89",
         "dice": {
           "count": 3,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "radiant"
       },
       {
+        "id": "dmg_90",
         "dice": {
           "count": 3,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "necrotic"
       }
@@ -10261,7 +10473,8 @@
       "description": "** The damage increases by 1d8 for each spell slot level above 3.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -10294,7 +10507,8 @@
       "description": "** The damage increases by 1d8 for every slot level above 2.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -10325,9 +10539,11 @@
     "attackType": "ranged",
     "damage": [
       {
+        "id": "dmg_91",
         "dice": {
           "count": 1,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "radiant"
       }
@@ -10467,37 +10683,47 @@
     },
     "damage": [
       {
+        "id": "dmg_92",
         "dice": {
           "count": 2,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "thunder"
       },
       {
+        "id": "dmg_93",
         "dice": {
           "count": 4,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "acid"
       },
       {
+        "id": "dmg_94",
         "dice": {
           "count": 10,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "lightning"
       },
       {
+        "id": "dmg_95",
         "dice": {
           "count": 2,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "bludgeoning"
       },
       {
+        "id": "dmg_96",
         "dice": {
           "count": 1,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "cold"
       }
@@ -10605,9 +10831,11 @@
     },
     "damage": [
       {
+        "id": "dmg_97",
         "dice": {
           "count": 6,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "radiant"
       }
@@ -10653,9 +10881,11 @@
     },
     "damage": [
       {
+        "id": "dmg_98",
         "dice": {
           "count": 12,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "radiant"
       }
@@ -10693,8 +10923,7 @@
       }
     },
     "duration": {
-      "type": "untilDispelled",
-      "concentration": false
+      "type": "untilDispelled"
     },
     "description": "You inscribe a harmful glyph either on a surface (such as a section of floor or wall) or within an object that can be closed (such as a book or chest). The glyph can cover an area no larger than 10 feet in diameter. If you choose an object, it must remain in place; if it is moved more than 10 feet from where you cast this spell, the glyph is broken, and the spell ends without being triggered.\n\nThe glyph is nearly imperceptible and requires a successful Wisdom (Perception) check against your spell save DC to notice.\n\nWhen you inscribe the glyph, you set its trigger and choose which effect the symbol bears: Death, Discord, Fear, Pain, Sleep, or Stunning. Each one is explained below.\n\n**_Set the Trigger._** You decide what triggers the glyph when you cast the spell. For glyphs inscribed on a surface, common triggers include touching or stepping on the glyph, removing another object covering it, or approaching within a certain distance of it. For glyphs inscribed within an object, common triggers include opening that object or seeing the glyph.\n\nYou can refine the trigger so that only creatures of certain types activate it (for example, the glyph could be set to affect Aberrations). You can also set conditions for creatures that don't trigger the glyph, such as those who say a certain password.\n\nOnce triggered, the glyph glows, filling a 60-foot-radius Sphere with Dim Light for 10 minutes, after which time the spell ends. Each creature in the Sphere when the glyph activates is targeted by its effect, as is a creature that enters the Sphere for the first time on a turn or ends its turn there. A creature is targeted only once per turn.\n\n**_Death._** Each target makes a Constitution saving throw, taking 10d10 Necrotic damage on a failed save or half as much damage on a successful save.\n\n**_Discord._** Each target makes a Wisdom saving throw. On a failed save, a target argues with other creatures for 1 minute. During this time, it is incapable of meaningful communication and has Disadvantage on attack rolls and ability checks.\n\n**_Fear._** Each target must succeed on a Wisdom saving throw or have the Frightened condition for 1 minute. While Frightened, the target must move at least 30 feet away from the glyph on each of its turns, if able.\n\n**_Pain._** Each target must succeed on a Constitution saving throw or have the Incapacitated condition for 1 minute.\n\n**_Sleep._** Each target must succeed on a Wisdom saving throw or have the Unconscious condition for 10 minutes. A creature awakens if it takes damage or if someone takes an action to shake it awake.\n\n**_Stunning._** Each target must succeed on a Wisdom saving throw or have the Stunned condition for 1 minute.",
     "savingThrow": {
@@ -10704,9 +10933,11 @@
     },
     "damage": [
       {
+        "id": "dmg_99",
         "dice": {
           "count": 10,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "necrotic"
       }
@@ -10802,9 +11033,11 @@
     "description": "This spell instantly transports you and up to eight willing creatures that you can see within range, or a single object that you can see within range, to a destination you select. If you target an object, it must be Large or smaller, and it can't be held or carried by an unwilling creature.\n\nThe destination you choose must be known to you, and it must be on the same plane of existence as you. Your familiarity with the destination determines whether you arrive there successfully. The GM rolls 1d100 and consults the Teleportation Outcome table and the explanations after it.\n\nTable: Teleportation Outcome\n\n| Familiarity              | Mishap | Similar Area | Off Target | On Target |\n|--------------------------|--------|--------------|------------|-----------|\n| Permanent circle         | —      | —            | —          | 01–00     |\n| Linked object            | —      | —            | —          | 01–00     |\n| Very familiar            | 01–05  | 06–13        | 14–24      | 25–00     |\n| Seen casually            | 01–33  | 34–43        | 44–53      | 54–00     |\n| Viewed once or described | 01–43  | 44–53        | 54–73      | 74–00     |\n| False destination        | 01–50  | 51–00        | —          | —         |\n\n**_Familiarity._** Here are the meanings of the terms in the table's Familiarity column:\n\n- \"Permanent circle\" means a permanent teleportation circle whose sigil sequence you know.\n- \"Linked object\" means you possess an object taken from the desired destination within the last six months, such as a book from a wizard's library.\n- \"Very familiar\" is a place you have visited often, a place you have carefully studied, or a place you can see when you cast the spell.\n- \"Seen casually\" is a place you have seen more than once but with which you aren't very familiar.\n- \"Viewed once or described\" is a place you have seen once, possibly using magic, or a place you know through someone else's description, perhaps from a map.\n- \"False destination\" is a place that doesn't exist. Perhaps you tried to scry an enemy's sanctum but instead viewed an illusion, or you are attempting to teleport to a location that no longer exists.\n\n**_Mishap._** The spell's unpredictable magic results in a difficult journey. Each teleporting creature (or the target object) takes 3d10 Force damage, and the GM rerolls on the table to see where you wind up (multiple mishaps can occur, dealing damage each time).\n\n**_Similar Area._** You and your group (or the target object) appear in a different area that's visually or thematically similar to the target area. You appear in the closest similar place. If you are heading for your home laboratory, for example, you might appear in another person's laboratory in the same city.\n\n**_Off Target._** You and your group (or the target object) appear 2d12 miles away from the destination in a random direction. Roll 1d8 for the direction: 1, east; 2, southeast; 3, south; 4, southwest; 5, west; 6, northwest; 7, north; or 8, northeast.\n\n**_On Target._** You and your group (or the target object) appear where you intended.",
     "damage": [
       {
+        "id": "dmg_100",
         "dice": {
           "count": 3,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "force"
       }
@@ -10902,9 +11135,11 @@
     },
     "damage": [
       {
+        "id": "dmg_101",
         "dice": {
           "count": 2,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "thunder"
       }
@@ -10917,7 +11152,8 @@
       "description": "** The damage increases by 1d8 for each spell slot level above 1.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -11224,16 +11460,20 @@
     },
     "damage": [
       {
+        "id": "dmg_102",
         "dice": {
           "count": 6,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "bludgeoning"
       },
       {
+        "id": "dmg_103",
         "dice": {
           "count": 5,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "bludgeoning"
       }
@@ -11298,9 +11538,11 @@
     "attackType": "melee",
     "damage": [
       {
+        "id": "dmg_104",
         "dice": {
           "count": 3,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "necrotic"
       }
@@ -11309,7 +11551,8 @@
       "description": "** The damage increases by 1d6 for each spell slot level above 3.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d6"
+        "die": "d6",
+        "modifier": 0
       }
     }
   },
@@ -11341,9 +11584,11 @@
     },
     "damage": [
       {
+        "id": "dmg_105",
         "dice": {
           "count": 1,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "psychic"
       }
@@ -11389,16 +11634,20 @@
     },
     "damage": [
       {
+        "id": "dmg_106",
         "dice": {
           "count": 10,
-          "die": "d4"
+          "die": "d4",
+          "modifier": 0
         },
         "type": "acid"
       },
       {
+        "id": "dmg_107",
         "dice": {
           "count": 5,
-          "die": "d4"
+          "die": "d4",
+          "modifier": 0
         },
         "type": "acid"
       }
@@ -11411,7 +11660,8 @@
       "description": "** The initial damage increases by 2d4 for each spell slot level above 4.",
       "damagePerLevel": {
         "count": 2,
-        "die": "d4"
+        "die": "d4",
+        "modifier": 0
       }
     }
   },
@@ -11451,16 +11701,20 @@
     },
     "damage": [
       {
+        "id": "dmg_108",
         "dice": {
           "count": 5,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "fire"
       },
       {
+        "id": "dmg_109",
         "dice": {
           "count": 5,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "fire"
       }
@@ -11469,7 +11723,8 @@
       "description": "** The damage increases by 1d8 for each spell slot level above 4.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -11535,16 +11790,20 @@
     },
     "damage": [
       {
+        "id": "dmg_110",
         "dice": {
           "count": 10,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "cold"
       },
       {
+        "id": "dmg_111",
         "dice": {
           "count": 5,
-          "die": "d6"
+          "die": "d6",
+          "modifier": 0
         },
         "type": "cold"
       }
@@ -11553,7 +11812,8 @@
       "description": "** The damage the wall deals when it appears increases by 2d6 and the damage from passing through the sheet of frigid air increases by 1d6 for each spell slot level above 6.",
       "damagePerLevel": {
         "count": 2,
-        "die": "d6"
+        "die": "d6",
+        "modifier": 0
       }
     }
   },
@@ -11625,16 +11885,20 @@
     },
     "damage": [
       {
+        "id": "dmg_112",
         "dice": {
           "count": 7,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "piercing"
       },
       {
+        "id": "dmg_113",
         "dice": {
           "count": 7,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "slashing"
       }
@@ -11643,7 +11907,8 @@
       "description": "** Both types of damage increase by 1d8 for each spell slot level above 6.",
       "damagePerLevel": {
         "count": 1,
-        "die": "d8"
+        "die": "d8",
+        "modifier": 0
       }
     }
   },
@@ -11773,9 +12038,11 @@
     },
     "damage": [
       {
+        "id": "dmg_114",
         "dice": {
           "count": 2,
-          "die": "d4"
+          "die": "d4",
+          "modifier": 0
         },
         "type": "fire"
       }
@@ -11817,16 +12084,20 @@
     },
     "damage": [
       {
+        "id": "dmg_115",
         "dice": {
           "count": 10,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "psychic"
       },
       {
+        "id": "dmg_116",
         "dice": {
           "count": 5,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "psychic"
       }
@@ -11901,9 +12172,11 @@
     },
     "damage": [
       {
+        "id": "dmg_117",
         "dice": {
           "count": 4,
-          "die": "d8"
+          "die": "d8",
+          "modifier": 0
         },
         "type": "bludgeoning"
       }
@@ -11934,9 +12207,11 @@
     "description": "*Wish* is the mightiest spell a mortal can cast. By simply speaking aloud, you can alter reality itself.\n\nThe basic use of this spell is to duplicate any other spell of level 8 or lower. If you use it this way, you don't need to meet any requirements to cast that spell, including costly components. The spell simply takes effect.\n\nAlternatively, you can create one of the following effects of your choice:\n\n**_Object Creation._** You create one object of up to 25,000 GP in value that isn't a magic item. The object can be no more than 300 feet in any dimension, and it appears in an unoccupied space that you can see on the ground.\n**_Instant Health._** You allow yourself and up to twenty creatures that you can see to regain all Hit Points, and you end all effects on them listed in the *Greater Restoration* spell.\n**_Resistance._** You grant up to ten creatures that you can see Resistance to one damage type that you choose. This Resistance is permanent.\n**_Spell Immunity._** You grant up to ten creatures you can see immunity to a single spell or other magical effect for 8 hours.\n**_Sudden Learning._** You replace one of your feats with another feat for which you are eligible. You lose all the benefits of the old feat and gain the benefits of the new one. You can't replace a feat that is a prerequisite for any of your other feats or features.\n**_Roll Redo._** You undo a single recent event by forcing a reroll of any die roll made within the last round (including your last turn). Reality reshapes itself to accommodate the new result. For example, a *Wish* spell could undo an ally's failed saving throw or a foe's Critical Hit. You can force the reroll to be made with Advantage or Disadvantage, and you choose whether to use the reroll or the original roll.\n**_Reshape Reality._** You may wish for something not included in any of the other effects. To do so, state your wish to the GM as precisely as possible. The GM has great latitude in ruling what occurs in such an instance; the greater the wish, the greater the likelihood that something goes wrong. This spell might simply fail, the effect you desire might be achieved only in part, or you might suffer an unforeseen consequence as a result of how you worded the wish. For example, wishing that a villain were dead might propel you forward in time to a period when that villain is no longer alive, effectively removing you from the game.\n\nSimilarly, wishing for a Legendary magic item or an Artifact might instantly transport you to the presence of the item's current owner. If your wish is granted and its effects have consequences for a whole community, region, or world, you are likely to attract powerful foes. If your wish would affect a god, the god's divine servants might instantly intervene to prevent it or to encourage you to craft the wish in a particular way. If your wish would undo the multiverse itself, your wish fails.\n\nThe stress of casting *Wish* to produce any effect other than duplicating another spell weakens you. After enduring that stress, each time you cast a spell until you finish a Long Rest, you take 1d10 Necrotic damage per level of that spell. This damage can't be reduced or prevented in any way. In addition, your Strength score becomes 3 for 2d4 days. For each of those days that you spend resting and doing nothing more than light activity, your remaining recovery time decreases by 2 days. Finally, there is a 33 percent chance that you are unable to cast *Wish* ever again if you suffer this stress.",
     "damage": [
       {
+        "id": "dmg_118",
         "dice": {
           "count": 1,
-          "die": "d10"
+          "die": "d10",
+          "modifier": 0
         },
         "type": "necrotic"
       }

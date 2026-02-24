@@ -99,7 +99,6 @@ export type SpellDuration = {
     duration: string;
 } | {
     type: 'untilDispelled';
-    concentration?: boolean;
 } | {
     type: 'special';
     description: string;

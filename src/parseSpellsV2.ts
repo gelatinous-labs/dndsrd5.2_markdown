@@ -1,7 +1,16 @@
+/**
+ * V2 spell parser: 07_Spells.md → spells.v2.json
+ *
+ * Produces a v2 artifact with:
+ *   - stable key/slug/source fields
+ *   - raw source blocks (sourceFile, startLine, endLine, markdown)
+ *   - same structured mechanics as v1 but without synthetic child IDs
+ *   - fixed duration model (concentration and untilDispelled are mutually exclusive)
+ */
+
 import * as fs from 'fs';
 import * as path from 'path';
 import {
-  Spell,
   SpellSchool,
   SpellClass,
   CastingTime,
@@ -12,21 +21,58 @@ import {
   SpellScaling,
   CantripScaling,
   AreaOfEffect,
-  DamageInstance,
   DiceExpression,
   DamageType,
-  DieType,
   AbilityKey,
   parseDiceExpression,
 } from './types';
 
-// Simple unique ID generator for sub-items
-let uniqueIdCounter = 0;
-function generateUniqueId(prefix: string): string {
-  return `${prefix}_${++uniqueIdCounter}`;
+// ---------------------------------------------------------------------------
+// V2-specific output types
+// ---------------------------------------------------------------------------
+
+interface DamageInstanceV2 {
+  dice: DiceExpression;
+  type: DamageType;
+  condition?: string;
 }
 
-// Valid schools
+interface SourceTextBlock {
+  sourceFile: string;
+  startLine: number;
+  endLine: number;
+  markdown: string;
+}
+
+interface SpellV2 {
+  key: string;
+  slug: string;
+  name: string;
+  source: string;
+  level: number;
+  school: SpellSchool;
+  classes: SpellClass[];
+  castingTime: CastingTime;
+  range: SpellRange;
+  components: SpellComponents;
+  duration: SpellDuration;
+  description: string;
+  attackType?: 'melee' | 'ranged';
+  savingThrow?: { ability: AbilityKey; onSuccess?: string; onFailure?: string };
+  damage?: DamageInstanceV2[];
+  healing?: DiceExpression;
+  areaOfEffect?: AreaOfEffect;
+  higherLevelScaling?: SpellScaling;
+  cantripScaling?: CantripScaling;
+  raw: SourceTextBlock;
+}
+
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+const SOURCE_FILE = '07_Spells.md';
+
 const SCHOOLS: SpellSchool[] = [
   'abjuration',
   'conjuration',
@@ -38,7 +84,6 @@ const SCHOOLS: SpellSchool[] = [
   'transmutation',
 ];
 
-// Valid classes
 const CLASSES: SpellClass[] = [
   'bard',
   'cleric',
@@ -50,7 +95,6 @@ const CLASSES: SpellClass[] = [
   'wizard',
 ];
 
-// Valid damage types
 const DAMAGE_TYPES: DamageType[] = [
   'acid',
   'bludgeoning',
@@ -67,19 +111,25 @@ const DAMAGE_TYPES: DamageType[] = [
   'thunder',
 ];
 
-function generateId(name: string): string {
+// ---------------------------------------------------------------------------
+// Slug / ID generation
+// ---------------------------------------------------------------------------
+
+function generateSlug(name: string): string {
   return name
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 }
 
+// ---------------------------------------------------------------------------
+// Parsing helpers (same logic as v1, adapted for v2 where needed)
+// ---------------------------------------------------------------------------
+
 function parseSchool(text: string): SpellSchool | null {
   const lower = text.toLowerCase();
   for (const school of SCHOOLS) {
-    if (lower.includes(school)) {
-      return school;
-    }
+    if (lower.includes(school)) return school;
   }
   return null;
 }
@@ -87,41 +137,30 @@ function parseSchool(text: string): SpellSchool | null {
 function parseClasses(text: string): SpellClass[] {
   const classes: SpellClass[] = [];
   const lower = text.toLowerCase();
-
   for (const cls of CLASSES) {
-    if (lower.includes(cls)) {
-      classes.push(cls);
-    }
+    if (lower.includes(cls)) classes.push(cls);
   }
-
   return classes;
 }
 
 function parseLevelAndSchool(
   line: string
 ): { level: number; school: SpellSchool; classes: SpellClass[] } | null {
-  // Format: "*Level 2 Evocation (Wizard)*" or "*Evocation Cantrip (Sorcerer, Wizard)*"
   const stripped = line.replace(/^\*+|\*+$/g, '').trim();
 
-  // Check for cantrip
   const cantripMatch = stripped.match(/^(\w+)\s+Cantrip\s*\(([^)]+)\)/i);
   if (cantripMatch) {
     const school = parseSchool(cantripMatch[1]);
     const classes = parseClasses(cantripMatch[2]);
-    if (school) {
-      return { level: 0, school, classes };
-    }
+    if (school) return { level: 0, school, classes };
   }
 
-  // Check for leveled spell: "Level X School (Classes)"
   const levelMatch = stripped.match(/^Level\s+(\d+)\s+(\w+)\s*\(([^)]+)\)/i);
   if (levelMatch) {
     const level = parseInt(levelMatch[1], 10);
     const school = parseSchool(levelMatch[2]);
     const classes = parseClasses(levelMatch[3]);
-    if (school) {
-      return { level, school, classes };
-    }
+    if (school) return { level, school, classes };
   }
 
   return null;
@@ -129,11 +168,8 @@ function parseLevelAndSchool(
 
 function parseCastingTime(text: string): CastingTime {
   const lower = text.toLowerCase().trim();
-
-  // Check for ritual
   const ritual = lower.includes('ritual');
 
-  // Check for reaction with trigger
   const reactionMatch = text.match(/reaction,?\s*which\s+you\s+take\s+(.+)/i);
   if (reactionMatch || lower.startsWith('reaction')) {
     return {
@@ -142,7 +178,6 @@ function parseCastingTime(text: string): CastingTime {
     };
   }
 
-  // Check for bonus action with trigger
   const bonusMatch = text.match(/bonus\s+action,?\s*which\s+you\s+take\s+(.+)/i);
   if (bonusMatch || lower.includes('bonus action')) {
     return {
@@ -151,106 +186,54 @@ function parseCastingTime(text: string): CastingTime {
     };
   }
 
-  // Check for time duration
   const minuteMatch = lower.match(/(\d+)\s*minute/);
   if (minuteMatch) {
-    return {
-      type: 'time',
-      minutes: parseInt(minuteMatch[1], 10),
-      ritual,
-    };
+    return { type: 'time', minutes: parseInt(minuteMatch[1], 10), ritual };
   }
 
   const hourMatch = lower.match(/(\d+)\s*hour/);
   if (hourMatch) {
-    return {
-      type: 'time',
-      minutes: parseInt(hourMatch[1], 10) * 60,
-      ritual,
-    };
+    return { type: 'time', minutes: parseInt(hourMatch[1], 10) * 60, ritual };
   }
 
-  // Default to action
-  return {
-    type: 'action',
-    ritual: ritual || undefined,
-  };
+  return { type: 'action', ritual: ritual || undefined };
 }
 
 function parseRange(text: string): SpellRange {
   const lower = text.toLowerCase().trim();
 
-  if (lower === 'self' || lower.startsWith('self')) {
-    return { type: 'self' };
-  }
+  if (lower === 'self' || lower.startsWith('self')) return { type: 'self' };
+  if (lower === 'touch') return { type: 'touch' };
+  if (lower === 'sight') return { type: 'sight' };
+  if (lower === 'unlimited' || lower.includes('unlimited')) return { type: 'unlimited' };
 
-  if (lower === 'touch') {
-    return { type: 'touch' };
-  }
-
-  if (lower === 'sight') {
-    return { type: 'sight' };
-  }
-
-  if (lower === 'unlimited' || lower.includes('unlimited')) {
-    return { type: 'unlimited' };
-  }
-
-  // Try to extract distance
   const distMatch = text.match(/(\d+)\s*(?:feet|ft\.?)/i);
-  if (distMatch) {
-    return { type: 'distance', feet: parseInt(distMatch[1], 10) };
-  }
+  if (distMatch) return { type: 'distance', feet: parseInt(distMatch[1], 10) };
 
-  // Mile conversion
   const mileMatch = text.match(/(\d+)\s*mile/i);
-  if (mileMatch) {
-    return { type: 'distance', feet: parseInt(mileMatch[1], 10) * 5280 };
-  }
+  if (mileMatch) return { type: 'distance', feet: parseInt(mileMatch[1], 10) * 5280 };
 
-  // Default to self if unparseable
   return { type: 'self' };
 }
 
 function parseComponents(text: string): SpellComponents {
-  const components: SpellComponents = {
-    verbal: false,
-    somatic: false,
-  };
-
-  // Check for V, S, M
+  const components: SpellComponents = { verbal: false, somatic: false };
   const upper = text.toUpperCase();
 
-  if (upper.includes('V')) {
-    components.verbal = true;
-  }
+  if (upper.includes('V')) components.verbal = true;
+  if (upper.includes('S')) components.somatic = true;
 
-  if (upper.includes('S')) {
-    components.somatic = true;
-  }
-
-  // Check for material component
   const materialMatch = text.match(/M\s*\(([^)]+)\)/i);
   if (materialMatch) {
     const matDesc = materialMatch[1].trim();
-    const material: MaterialComponent = {
-      description: matDesc,
-    };
+    const material: MaterialComponent = { description: matDesc };
 
-    // Check for gold cost
     const costMatch = matDesc.match(/worth\s+(\d+)\+?\s*GP/i);
-    if (costMatch) {
-      material.cost = parseInt(costMatch[1], 10);
-    }
-
-    // Check if consumed
-    if (matDesc.toLowerCase().includes('consume')) {
-      material.consumed = true;
-    }
+    if (costMatch) material.cost = parseInt(costMatch[1], 10);
+    if (matDesc.toLowerCase().includes('consume')) material.consumed = true;
 
     components.material = material;
   } else if (upper.includes('M')) {
-    // M without parentheses is unusual but handle it
     components.material = { description: 'unspecified material' };
   }
 
@@ -260,25 +243,17 @@ function parseComponents(text: string): SpellComponents {
 function parseDuration(text: string): SpellDuration {
   const lower = text.toLowerCase().trim();
 
-  if (lower === 'instantaneous') {
-    return { type: 'instantaneous' };
-  }
+  if (lower === 'instantaneous') return { type: 'instantaneous' };
 
-  // Check for concentration
+  // "Concentration, up to X" → concentration type
   const concMatch = text.match(/concentration,?\s*up\s*to\s*(.+)/i);
   if (concMatch) {
-    return {
-      type: 'concentration',
-      maxDuration: concMatch[1].trim(),
-    };
+    return { type: 'concentration', maxDuration: concMatch[1].trim() };
   }
 
   // "Concentration, until dispelled" → concentration type (mutually exclusive with untilDispelled)
   if (lower.includes('concentration') && lower.includes('until dispelled')) {
-    return {
-      type: 'concentration',
-      maxDuration: 'until dispelled',
-    };
+    return { type: 'concentration', maxDuration: 'until dispelled' };
   }
 
   // "Until dispelled" (without concentration)
@@ -286,25 +261,15 @@ function parseDuration(text: string): SpellDuration {
     return { type: 'untilDispelled' };
   }
 
-  // Otherwise it's a time duration
   if (lower.match(/\d+\s*(minute|hour|day|round|year)/)) {
-    return {
-      type: 'time',
-      duration: text.trim(),
-    };
+    return { type: 'time', duration: text.trim() };
   }
 
-  // Special/complex duration
-  return {
-    type: 'special',
-    description: text.trim(),
-  };
+  return { type: 'special', description: text.trim() };
 }
 
-function parseDamageFromText(text: string): DamageInstance[] {
-  const damages: DamageInstance[] = [];
-
-  // Pattern: "4d4 Acid damage" or "10d6 + 40 Force damage"
+function parseDamageFromText(text: string): DamageInstanceV2[] {
+  const damages: DamageInstanceV2[] = [];
   const damagePattern = /(\d+d\d+)(?:\s*\+\s*(\d+))?\s+(\w+)\s+damage/gi;
   let match;
 
@@ -315,7 +280,6 @@ function parseDamageFromText(text: string): DamageInstance[] {
     const parsed = parseDiceExpression(diceStr);
     if (parsed && DAMAGE_TYPES.includes(typeStr as DamageType)) {
       damages.push({
-        id: generateUniqueId('dmg'),
         dice: parsed,
         type: typeStr as DamageType,
       });
@@ -326,42 +290,27 @@ function parseDamageFromText(text: string): DamageInstance[] {
 }
 
 function parseAreaOfEffect(text: string): AreaOfEffect | undefined {
-  const lower = text.toLowerCase();
-
-  // Patterns for different shapes
   const sphereMatch = text.match(/(\d+)-foot(?:-radius)?\s*sphere/i);
-  if (sphereMatch) {
-    return { shape: 'sphere', size: parseInt(sphereMatch[1], 10) };
-  }
+  if (sphereMatch) return { shape: 'sphere', size: parseInt(sphereMatch[1], 10) };
 
   const coneMatch = text.match(/(\d+)-foot\s*cone/i);
-  if (coneMatch) {
-    return { shape: 'cone', size: parseInt(coneMatch[1], 10) };
-  }
+  if (coneMatch) return { shape: 'cone', size: parseInt(coneMatch[1], 10) };
 
   const cubeMatch = text.match(/(\d+)-foot\s*cube/i);
-  if (cubeMatch) {
-    return { shape: 'cube', size: parseInt(cubeMatch[1], 10) };
-  }
+  if (cubeMatch) return { shape: 'cube', size: parseInt(cubeMatch[1], 10) };
 
   const lineMatch = text.match(/(\d+)-foot(?:-long)?(?:,?\s*(\d+)-foot-wide)?\s*line/i);
   if (lineMatch) {
     const aoe: AreaOfEffect = { shape: 'line', size: parseInt(lineMatch[1], 10) };
-    if (lineMatch[2]) {
-      aoe.width = parseInt(lineMatch[2], 10);
-    }
+    if (lineMatch[2]) aoe.width = parseInt(lineMatch[2], 10);
     return aoe;
   }
 
   const cylinderMatch = text.match(/(\d+)-foot(?:-radius)?\s*cylinder/i);
-  if (cylinderMatch) {
-    return { shape: 'cylinder', size: parseInt(cylinderMatch[1], 10) };
-  }
+  if (cylinderMatch) return { shape: 'cylinder', size: parseInt(cylinderMatch[1], 10) };
 
   const emanationMatch = text.match(/(\d+)-foot\s*emanation/i);
-  if (emanationMatch) {
-    return { shape: 'emanation', size: parseInt(emanationMatch[1], 10) };
-  }
+  if (emanationMatch) return { shape: 'emanation', size: parseInt(emanationMatch[1], 10) };
 
   return undefined;
 }
@@ -378,27 +327,20 @@ function parseSavingThrow(
     charisma: 'cha',
   };
 
-  // Pattern: "Wisdom saving throw" or "makes a Dexterity saving throw"
   const saveMatch = text.match(
     /(strength|dexterity|constitution|intelligence|wisdom|charisma)\s+saving\s+throw/i
   );
 
   if (saveMatch) {
     const ability = abilityMap[saveMatch[1].toLowerCase()];
-
-    // Try to extract success/failure effects
     let onSuccess: string | undefined;
     let onFailure: string | undefined;
 
     const successMatch = text.match(/on\s+a\s+(?:successful\s+)?(?:save|success)[,:]?\s*([^.]+)/i);
-    if (successMatch) {
-      onSuccess = successMatch[1].trim();
-    }
+    if (successMatch) onSuccess = successMatch[1].trim();
 
     const failMatch = text.match(/on\s+a\s+failed\s+(?:save|saving throw)[,:]?\s*([^.]+)/i);
-    if (failMatch) {
-      onFailure = failMatch[1].trim();
-    }
+    if (failMatch) onFailure = failMatch[1].trim();
 
     return { ability, onSuccess, onFailure };
   }
@@ -408,69 +350,47 @@ function parseSavingThrow(
 
 function parseAttackType(text: string): 'melee' | 'ranged' | undefined {
   const lower = text.toLowerCase();
-
-  if (lower.includes('melee spell attack')) {
-    return 'melee';
-  }
-
-  if (lower.includes('ranged spell attack')) {
-    return 'ranged';
-  }
-
+  if (lower.includes('melee spell attack')) return 'melee';
+  if (lower.includes('ranged spell attack')) return 'ranged';
   return undefined;
 }
 
 function parseHigherLevelScaling(text: string): SpellScaling | undefined {
-  // Look for "Using a Higher-Level Spell Slot" section
   const match = text.match(/using\s+a\s+higher-level\s+spell\s+slot[._]*\s*(.+)/i);
   if (!match) return undefined;
 
   const description = match[1].trim();
-
   const scaling: SpellScaling = { description };
 
-  // Try to parse damage increase
   const damageMatch = description.match(/increases?\s+by\s+(\d+d\d+)/i);
   if (damageMatch) {
     const parsed = parseDiceExpression(damageMatch[1]);
-    if (parsed) {
-      scaling.damagePerLevel = parsed;
-    }
+    if (parsed) scaling.damagePerLevel = parsed;
   }
 
-  // Try to parse additional targets
   const targetMatch = description.match(/(\d+)\s+additional\s+(target|creature|beast)/i);
-  if (targetMatch) {
-    scaling.targetsPerLevel = parseInt(targetMatch[1], 10);
-  }
+  if (targetMatch) scaling.targetsPerLevel = parseInt(targetMatch[1], 10);
 
   return scaling;
 }
 
 function parseCantripScaling(text: string): CantripScaling | undefined {
-  // Look for "Cantrip Upgrade" section
   const match = text.match(/cantrip\s+upgrade[._]*\s*(.+)/i);
   if (!match) return undefined;
 
   const description = match[1].trim();
-
-  // Extract levels (typically 5, 11, 17)
   const levels: number[] = [];
   const levelMatches = description.matchAll(/level[s]?\s+(\d+)/gi);
   for (const m of levelMatches) {
     levels.push(parseInt(m[1], 10));
   }
 
-  // If no explicit levels found, use defaults
-  if (levels.length === 0) {
-    levels.push(5, 11, 17);
-  }
+  if (levels.length === 0) levels.push(5, 11, 17);
 
   return { description, levels };
 }
 
 function parseHealing(text: string): DiceExpression | undefined {
-  // Pattern: "regains 1d8 + 4 hit points" or "regain 2d6 hit points"
   const healMatch = text.match(/regains?\s+(\d+d\d+)(?:\s*\+\s*(\d+))?\s+hit\s+points/i);
   if (healMatch) {
     const diceStr = healMatch[1] + (healMatch[2] ? `+${healMatch[2]}` : '');
@@ -479,19 +399,36 @@ function parseHealing(text: string): DiceExpression | undefined {
   return undefined;
 }
 
-interface SpellBlock {
+// ---------------------------------------------------------------------------
+// Block splitting with line tracking
+// ---------------------------------------------------------------------------
+
+interface SpellBlockV2 {
   name: string;
   lines: string[];
+  /** 1-based line number of the #### header in the source file */
+  headerLineNumber: number;
+  /** 1-based line number of the last content line */
+  endLineNumber: number;
+  /** Full markdown text including header */
+  rawMarkdown: string;
 }
 
-function splitIntoSpellBlocks(content: string): SpellBlock[] {
-  const lines = content.split('\n');
-  const blocks: SpellBlock[] = [];
-  let currentBlock: SpellBlock | null = null;
+function splitIntoSpellBlocks(content: string): SpellBlockV2[] {
+  const allLines = content.split('\n');
+  const blocks: SpellBlockV2[] = [];
+  let currentBlock: {
+    name: string;
+    headerLineNumber: number;
+    headerText: string;
+    lines: Array<{ text: string; lineNumber: number }>;
+  } | null = null;
   let inSpellDescriptions = false;
 
-  for (const line of lines) {
-    // Check if we've reached the spell descriptions section
+  for (let i = 0; i < allLines.length; i++) {
+    const line = allLines[i];
+    const lineNumber = i + 1; // 1-based
+
     if (line.startsWith('## Spell Descriptions')) {
       inSpellDescriptions = true;
       continue;
@@ -499,31 +436,65 @@ function splitIntoSpellBlocks(content: string): SpellBlock[] {
 
     if (!inSpellDescriptions) continue;
 
-    // Check for section headers like "### A Spells"
-    if (line.match(/^###\s+[A-Z]\s+Spells/)) {
-      continue;
-    }
+    // Skip letter-group headers like "### A Spells"
+    if (line.match(/^###\s+[A-Z]\s+Spells/)) continue;
 
-    // Check for spell header (#### Name)
+    // Spell header: #### SpellName
     const headerMatch = line.match(/^####\s+(?:\*\*)?(.+?)(?:\*\*)?$/);
     if (headerMatch) {
       if (currentBlock) {
-        blocks.push(currentBlock);
+        const lastLine =
+          currentBlock.lines.length > 0
+            ? currentBlock.lines[currentBlock.lines.length - 1]!.lineNumber
+            : currentBlock.headerLineNumber;
+        blocks.push({
+          name: currentBlock.name,
+          lines: currentBlock.lines.map((l) => l.text),
+          headerLineNumber: currentBlock.headerLineNumber,
+          endLineNumber: lastLine,
+          rawMarkdown: [
+            currentBlock.headerText,
+            ...currentBlock.lines.map((l) => l.text),
+          ].join('\n'),
+        });
       }
-      currentBlock = { name: headerMatch[1].trim(), lines: [] };
+      currentBlock = {
+        name: headerMatch[1].trim(),
+        headerLineNumber: lineNumber,
+        headerText: line,
+        lines: [],
+      };
     } else if (currentBlock) {
-      currentBlock.lines.push(line);
+      currentBlock.lines.push({ text: line, lineNumber });
     }
   }
 
+  // Flush final block
   if (currentBlock) {
-    blocks.push(currentBlock);
+    const lastLine =
+      currentBlock.lines.length > 0
+        ? currentBlock.lines[currentBlock.lines.length - 1]!.lineNumber
+        : currentBlock.headerLineNumber;
+    blocks.push({
+      name: currentBlock.name,
+      lines: currentBlock.lines.map((l) => l.text),
+      headerLineNumber: currentBlock.headerLineNumber,
+      endLineNumber: lastLine,
+      rawMarkdown: [
+        currentBlock.headerText,
+        ...currentBlock.lines.map((l) => l.text),
+      ].join('\n'),
+    });
   }
 
   return blocks;
 }
 
-function parseSpellBlock(block: SpellBlock): Spell | null {
+// ---------------------------------------------------------------------------
+// Parse a spell block into a SpellV2
+// ---------------------------------------------------------------------------
+
+function parseSpellBlock(block: SpellBlockV2): SpellV2 | null {
   const { name, lines } = block;
 
   // Find the level/school/class line (first italic line)
@@ -549,10 +520,13 @@ function parseSpellBlock(block: SpellBlock): Spell | null {
     return null;
   }
 
-  // Initialize spell with defaults
-  const spell: Spell = {
-    id: generateId(name),
+  const slug = generateSlug(name);
+
+  const spell: SpellV2 = {
+    key: `spell:${slug}`,
+    slug,
     name,
+    source: 'srd',
     level: levelSchool.level,
     school: levelSchool.school,
     classes: levelSchool.classes,
@@ -561,9 +535,15 @@ function parseSpellBlock(block: SpellBlock): Spell | null {
     components: { verbal: false, somatic: false },
     duration: { type: 'instantaneous' },
     description: '',
+    raw: {
+      sourceFile: SOURCE_FILE,
+      startLine: block.headerLineNumber,
+      endLine: block.endLineNumber,
+      markdown: block.rawMarkdown,
+    },
   };
 
-  // Parse the attribute lines
+  // Parse attribute lines
   let descriptionStartIdx = -1;
   for (let i = levelSchoolIdx + 1; i < lines.length; i++) {
     const line = lines[i].trim();
@@ -586,7 +566,6 @@ function parseSpellBlock(block: SpellBlock): Spell | null {
       const value = line.replace(/\*\*Duration:?\*\*:?\s*/i, '').trim();
       spell.duration = parseDuration(value);
     } else if (line && !line.startsWith('**') && !line.startsWith('|')) {
-      // This is the start of the description
       descriptionStartIdx = i;
       break;
     }
@@ -597,10 +576,7 @@ function parseSpellBlock(block: SpellBlock): Spell | null {
     const descLines: string[] = [];
     for (let i = descriptionStartIdx; i < lines.length; i++) {
       const line = lines[i];
-      // Stop at embedded stat blocks (they start with "> ####")
-      if (line.startsWith('> ####')) {
-        break;
-      }
+      if (line.startsWith('> ####')) break;
       descLines.push(line);
     }
     spell.description = descLines.join('\n').trim();
@@ -609,60 +585,42 @@ function parseSpellBlock(block: SpellBlock): Spell | null {
   // Parse additional properties from description
   const fullText = spell.description;
 
-  // Attack type
   const attackType = parseAttackType(fullText);
-  if (attackType) {
-    spell.attackType = attackType;
-  }
+  if (attackType) spell.attackType = attackType;
 
-  // Saving throw
   const savingThrow = parseSavingThrow(fullText);
-  if (savingThrow) {
-    spell.savingThrow = savingThrow;
-  }
+  if (savingThrow) spell.savingThrow = savingThrow;
 
-  // Damage
   const damage = parseDamageFromText(fullText);
-  if (damage.length > 0) {
-    spell.damage = damage;
-  }
+  if (damage.length > 0) spell.damage = damage;
 
-  // Healing
   const healing = parseHealing(fullText);
-  if (healing) {
-    spell.healing = healing;
-  }
+  if (healing) spell.healing = healing;
 
-  // Area of effect
   const aoe = parseAreaOfEffect(fullText);
-  if (aoe) {
-    spell.areaOfEffect = aoe;
-  }
+  if (aoe) spell.areaOfEffect = aoe;
 
-  // Higher level scaling (for level 1+ spells)
   if (spell.level > 0) {
     const scaling = parseHigherLevelScaling(fullText);
-    if (scaling) {
-      spell.higherLevelScaling = scaling;
-    }
+    if (scaling) spell.higherLevelScaling = scaling;
   }
 
-  // Cantrip scaling (for cantrips)
   if (spell.level === 0) {
     const cantripScale = parseCantripScaling(fullText);
-    if (cantripScale) {
-      spell.cantripScaling = cantripScale;
-    }
+    if (cantripScale) spell.cantripScaling = cantripScale;
   }
 
   return spell;
 }
 
+// ---------------------------------------------------------------------------
+// Main
+// ---------------------------------------------------------------------------
+
 function main() {
-  // __dirname is dist/ when compiled, so go up and into src/
   const srcDir = path.join(__dirname, '..', 'src');
-  const inputPath = path.join(srcDir, '07_Spells.md');
-  const outputPath = path.join(srcDir, 'spells.json');
+  const inputPath = path.join(srcDir, SOURCE_FILE);
+  const outputPath = path.join(srcDir, 'spells.v2.json');
 
   console.log(`Reading spells from: ${inputPath}`);
 
@@ -671,19 +629,29 @@ function main() {
 
   console.log(`Found ${blocks.length} spell blocks`);
 
-  const spells: Spell[] = [];
+  const spells: SpellV2[] = [];
 
   for (const block of blocks) {
     const spell = parseSpellBlock(block);
-    if (spell) {
-      spells.push(spell);
-    }
+    if (spell) spells.push(spell);
   }
 
   console.log(`Successfully parsed ${spells.length} spells`);
 
+  // Summary stats
+  const cantrips = spells.filter((s) => s.level === 0).length;
+  const leveled = spells.filter((s) => s.level > 0).length;
+  const withDamage = spells.filter((s) => s.damage && s.damage.length > 0).length;
+  const withSave = spells.filter((s) => s.savingThrow).length;
+  const withAttack = spells.filter((s) => s.attackType).length;
+  const withConcentration = spells.filter((s) => s.duration.type === 'concentration').length;
+
+  console.log(`  Cantrips: ${cantrips}, Leveled: ${leveled}`);
+  console.log(`  With damage: ${withDamage}, With save: ${withSave}, With attack: ${withAttack}`);
+  console.log(`  Concentration: ${withConcentration}`);
+
   fs.writeFileSync(outputPath, JSON.stringify(spells, null, 2));
-  console.log(`Wrote spells to: ${outputPath}`);
+  console.log(`Wrote spells v2 to: ${outputPath}`);
 }
 
 main();

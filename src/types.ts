@@ -253,7 +253,7 @@ export type SpellDuration =
   | { type: 'instantaneous' }
   | { type: 'concentration'; maxDuration: string }
   | { type: 'time'; duration: string }
-  | { type: 'untilDispelled'; concentration?: boolean }
+  | { type: 'untilDispelled' }
   | { type: 'special'; description: string };
 
 /** Scaling when cast at higher levels */
