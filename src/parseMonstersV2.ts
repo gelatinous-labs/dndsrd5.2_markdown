@@ -1,5 +1,19 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
+import type {
+  ActionSection,
+  ActivationType,
+  AttackType,
+  MonsterActionDefinitionV2,
+  UsageLimit,
+} from "./actionDefinitionV2";
+import {
+  buildDiceFormula,
+  inferAttackFormula,
+  inferSaveDCFormula,
+  inferSpellAttackBonusFormula,
+  inferSpellSaveDCFormula,
+} from "./formulaInferenceV2";
 import type {
   AbilityKey,
   AbilityScores,
@@ -12,22 +26,8 @@ import type {
   Size,
   Skill,
   Speed,
-} from './types';
-import { parseDiceExpression } from './types';
-import type {
-  ActionSection,
-  ActivationType,
-  AttackType,
-  MonsterActionDefinitionV2,
-  UsageLimit,
-} from './actionDefinitionV2';
-import {
-  buildDiceFormula,
-  inferAttackFormula,
-  inferSaveDCFormula,
-  inferSpellAttackBonusFormula,
-  inferSpellSaveDCFormula,
-} from './formulaInferenceV2';
+} from "./types";
+import { parseDiceExpression } from "./types";
 
 /**
  * Monsters V2 generator.
@@ -46,7 +46,7 @@ export interface MonsterV2 {
   slug: string;
   name: string;
   /** Source tag for compendium ingestion. */
-  source: 'srd';
+  source: "srd";
   size: Size;
   creatureType: CreatureType;
   tags?: string[];
@@ -97,91 +97,91 @@ export interface SkillProficiencyV2 {
 // =============================================================================
 
 const SKILL_NAME_MAP: Record<string, Skill> = {
-  acrobatics: 'acrobatics',
-  'animal handling': 'animalHandling',
-  arcana: 'arcana',
-  athletics: 'athletics',
-  deception: 'deception',
-  history: 'history',
-  insight: 'insight',
-  intimidation: 'intimidation',
-  investigation: 'investigation',
-  medicine: 'medicine',
-  nature: 'nature',
-  perception: 'perception',
-  performance: 'performance',
-  persuasion: 'persuasion',
-  religion: 'religion',
-  'sleight of hand': 'sleightOfHand',
-  stealth: 'stealth',
-  survival: 'survival',
+  acrobatics: "acrobatics",
+  "animal handling": "animalHandling",
+  arcana: "arcana",
+  athletics: "athletics",
+  deception: "deception",
+  history: "history",
+  insight: "insight",
+  intimidation: "intimidation",
+  investigation: "investigation",
+  medicine: "medicine",
+  nature: "nature",
+  perception: "perception",
+  performance: "performance",
+  persuasion: "persuasion",
+  religion: "religion",
+  "sleight of hand": "sleightOfHand",
+  stealth: "stealth",
+  survival: "survival",
 };
 
 const DAMAGE_TYPES: DamageType[] = [
-  'acid',
-  'bludgeoning',
-  'cold',
-  'fire',
-  'force',
-  'lightning',
-  'necrotic',
-  'piercing',
-  'poison',
-  'psychic',
-  'radiant',
-  'slashing',
-  'thunder',
+  "acid",
+  "bludgeoning",
+  "cold",
+  "fire",
+  "force",
+  "lightning",
+  "necrotic",
+  "piercing",
+  "poison",
+  "psychic",
+  "radiant",
+  "slashing",
+  "thunder",
 ];
 
 const CONDITIONS: Condition[] = [
-  'blinded',
-  'charmed',
-  'deafened',
-  'exhaustion',
-  'frightened',
-  'grappled',
-  'incapacitated',
-  'invisible',
-  'paralyzed',
-  'petrified',
-  'poisoned',
-  'prone',
-  'restrained',
-  'stunned',
-  'unconscious',
+  "blinded",
+  "charmed",
+  "deafened",
+  "exhaustion",
+  "frightened",
+  "grappled",
+  "incapacitated",
+  "invisible",
+  "paralyzed",
+  "petrified",
+  "poisoned",
+  "prone",
+  "restrained",
+  "stunned",
+  "unconscious",
 ];
 
 const CREATURE_TYPE_MAP: Record<string, CreatureType> = {
-  aberration: 'aberration',
-  beast: 'beast',
-  celestial: 'celestial',
-  construct: 'construct',
-  dragon: 'dragon',
-  elemental: 'elemental',
-  fey: 'fey',
-  fiend: 'fiend',
-  giant: 'giant',
-  humanoid: 'humanoid',
-  monstrosity: 'monstrosity',
-  ooze: 'ooze',
-  plant: 'plant',
-  undead: 'undead',
+  aberration: "aberration",
+  beast: "beast",
+  celestial: "celestial",
+  construct: "construct",
+  dragon: "dragon",
+  elemental: "elemental",
+  fey: "fey",
+  fiend: "fiend",
+  giant: "giant",
+  humanoid: "humanoid",
+  monstrosity: "monstrosity",
+  ooze: "ooze",
+  plant: "plant",
+  undead: "undead",
 };
 
 const SIZE_MAP: Record<string, Size> = {
-  tiny: 'Tiny',
-  small: 'Small',
-  medium: 'Medium',
-  large: 'Large',
-  huge: 'Huge',
-  gargantuan: 'Gargantuan',
+  tiny: "Tiny",
+  small: "Small",
+  medium: "Medium",
+  large: "Large",
+  huge: "Huge",
+  gargantuan: "Gargantuan",
 };
 
 function slugify(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 function generateId(name: string): string {
@@ -193,19 +193,25 @@ function parseSize(text: string): Size {
   for (const [key, value] of Object.entries(SIZE_MAP)) {
     if (lower.includes(key)) return value;
   }
-  return 'Medium';
+  return "Medium";
 }
 
-function parseCreatureType(text: string): { type: CreatureType; tags?: string[] } {
+function parseCreatureType(text: string): {
+  type: CreatureType;
+  tags?: string[];
+} {
   const tagMatch = text.match(/\(([^)]+)\)/);
   const tags = tagMatch ? [tagMatch[1]] : undefined;
-  const typeText = text.replace(/\([^)]+\)/, '').toLowerCase().trim();
+  const typeText = text
+    .replace(/\([^)]+\)/, "")
+    .toLowerCase()
+    .trim();
 
   for (const [key, value] of Object.entries(CREATURE_TYPE_MAP)) {
     if (typeText.includes(key)) return { type: value, tags };
   }
 
-  return { type: 'humanoid', tags };
+  return { type: "humanoid", tags };
 }
 
 function parseSpeed(speedText: string): Speed {
@@ -226,7 +232,7 @@ function parseSpeed(speedText: string): Speed {
   const climbMatch = speedText.match(/climb\s+(\d+)\s*ft\./i);
   if (climbMatch) speed.climb = parseInt(climbMatch[1], 10);
 
-  if (speedText.toLowerCase().includes('hover')) speed.hover = true;
+  if (speedText.toLowerCase().includes("hover")) speed.hover = true;
 
   return speed;
 }
@@ -263,13 +269,17 @@ function parseAC(acText: string): number {
   return match ? parseInt(match[1], 10) : 10;
 }
 
-function parseCR(crText: string): { cr: number; xp?: number; xpInLair?: number } {
+function parseCR(crText: string): {
+  cr: number;
+  xp?: number;
+  xpInLair?: number;
+} {
   let cr = 0;
   const crMatch = crText.match(/^([\d/]+)/);
   if (crMatch) {
     const crStr = crMatch[1];
-    if (crStr.includes('/')) {
-      const [num, denom] = crStr.split('/').map((n) => parseInt(n, 10));
+    if (crStr.includes("/")) {
+      const [num, denom] = crStr.split("/").map((n) => parseInt(n, 10));
       cr = num / denom;
     } else {
       cr = parseInt(crStr, 10);
@@ -280,10 +290,10 @@ function parseCR(crText: string): { cr: number; xp?: number; xpInLair?: number }
   let xpInLair: number | undefined;
 
   const lairMatch = crText.match(/or\s+([\d,]+)\s*in\s*lair/i);
-  if (lairMatch) xpInLair = parseInt(lairMatch[1].replace(/,/g, ''), 10);
+  if (lairMatch) xpInLair = parseInt(lairMatch[1].replace(/,/g, ""), 10);
 
   const xpMatch = crText.match(/XP\s+([\d,]+)/);
-  if (xpMatch) xp = parseInt(xpMatch[1].replace(/,/g, ''), 10);
+  if (xpMatch) xp = parseInt(xpMatch[1].replace(/,/g, ""), 10);
 
   return { cr, xp, xpInLair };
 }
@@ -325,9 +335,10 @@ function parseSkills(skillsText: string): SkillProficiencyV2[] {
   return skills;
 }
 
-function parseAbilityScores(
-  lines: string[]
-): { scores: AbilityScores; saveProficiencies: AbilityKey[] } {
+function parseAbilityScores(lines: string[]): {
+  scores: AbilityScores;
+  saveProficiencies: AbilityKey[];
+} {
   const scores: AbilityScores = {
     str: 10,
     dex: 10,
@@ -339,17 +350,17 @@ function parseAbilityScores(
   const saveProficiencies: AbilityKey[] = [];
 
   const abilityMap: Record<string, AbilityKey> = {
-    STR: 'str',
-    DEX: 'dex',
-    CON: 'con',
-    INT: 'int',
-    WIS: 'wis',
-    CHA: 'cha',
+    STR: "str",
+    DEX: "dex",
+    CON: "con",
+    INT: "int",
+    WIS: "wis",
+    CHA: "cha",
   };
 
   for (const line of lines) {
     const match = line.match(
-      /\|\s*(STR|DEX|CON|INT|WIS|CHA)\s*\|\s*(\d+)\s*\|\s*([+-]?\d+)\s*\|\s*([+-]?\d+)\s*\|/i
+      /\|\s*(STR|DEX|CON|INT|WIS|CHA)\s*\|\s*(\d+)\s*\|\s*([+-]?\d+)\s*\|\s*([+-]?\d+)\s*\|/i,
     );
     if (!match) continue;
 
@@ -405,7 +416,7 @@ function parseDamageFromText(text: string): ParsedDamageText[] {
   let match: RegExpExecArray | null;
 
   while ((match = damagePattern.exec(text)) !== null) {
-    const diceExpr = match[2] + (match[3] ? match[3].replace(/\s/g, '') : '');
+    const diceExpr = match[2] + (match[3] ? match[3].replace(/\s/g, "") : "");
     const typeStr = match[4].toLowerCase();
     const parsed = parseDiceExpression(diceExpr);
     if (!parsed) continue;
@@ -433,20 +444,20 @@ function parseOutcomeText(description: string): {
 }
 
 function parseAreaOfEffect(description: string):
-  | { shape: 'line'; size: number; width?: number; origin?: string }
+  | { shape: "line"; size: number; width?: number; origin?: string }
   | {
-      shape: 'cone' | 'cube' | 'cylinder' | 'emanation' | 'sphere';
+      shape: "cone" | "cube" | "cylinder" | "emanation" | "sphere";
       size: number;
       origin?: string;
     }
   | undefined {
   // Line: "60-foot-long, 5-foot-wide Line"
   const lineMatch = description.match(
-    /(\d+)-foot-long,\s*(\d+)-foot-wide\s+Line/i
+    /(\d+)-foot-long,\s*(\d+)-foot-wide\s+Line/i,
   );
   if (lineMatch) {
     return {
-      shape: 'line',
+      shape: "line",
       size: parseInt(lineMatch[1], 10),
       width: parseInt(lineMatch[2], 10),
     };
@@ -454,15 +465,15 @@ function parseAreaOfEffect(description: string):
 
   // Generic: "30-foot Cone", "5-foot Emanation", "20-foot-radius Sphere"
   const aoeMatch = description.match(
-    /(\d+)-foot(?:-radius)?\s+(Cone|Cube|Cylinder|Emanation|Sphere)/i
+    /(\d+)-foot(?:-radius)?\s+(Cone|Cube|Cylinder|Emanation|Sphere)/i,
   );
   if (aoeMatch) {
     const shape = aoeMatch[2].toLowerCase() as
-      | 'cone'
-      | 'cube'
-      | 'cylinder'
-      | 'emanation'
-      | 'sphere';
+      | "cone"
+      | "cube"
+      | "cylinder"
+      | "emanation"
+      | "sphere";
     return { shape, size: parseInt(aoeMatch[1], 10) };
   }
 
@@ -471,37 +482,37 @@ function parseAreaOfEffect(description: string):
 
 function sectionActivation(section: ActionSection): ActivationType {
   switch (section) {
-    case 'actions':
-      return 'action';
-    case 'bonusActions':
-      return 'bonusAction';
-    case 'reactions':
-      return 'reaction';
-    case 'legendaryActions':
-      return 'special';
-    case 'spells':
-      return 'special';
-    case 'traits':
+    case "actions":
+      return "action";
+    case "bonusActions":
+      return "bonusAction";
+    case "reactions":
+      return "reaction";
+    case "legendaryActions":
+      return "special";
+    case "spells":
+      return "special";
+    case "traits":
     default:
-      return 'passive';
+      return "passive";
   }
 }
 
 function mapAttackType(raw: string): AttackType {
   const lower = raw.toLowerCase();
-  if (lower.includes('melee or ranged')) return 'melee_or_ranged';
-  if (lower.includes('ranged')) return 'ranged';
-  return 'melee';
+  if (lower.includes("melee or ranged")) return "melee_or_ranged";
+  if (lower.includes("ranged")) return "ranged";
+  return "melee";
 }
 
 function abilityKeyFromFullName(name: string): AbilityKey {
   const lower = name.toLowerCase();
-  if (lower.startsWith('strength')) return 'str';
-  if (lower.startsWith('dexterity')) return 'dex';
-  if (lower.startsWith('constitution')) return 'con';
-  if (lower.startsWith('intelligence')) return 'int';
-  if (lower.startsWith('wisdom')) return 'wis';
-  return 'cha';
+  if (lower.startsWith("strength")) return "str";
+  if (lower.startsWith("dexterity")) return "dex";
+  if (lower.startsWith("constitution")) return "con";
+  if (lower.startsWith("intelligence")) return "int";
+  if (lower.startsWith("wisdom")) return "wis";
+  return "cha";
 }
 
 function parseNameQualifiers(name: string): {
@@ -521,7 +532,7 @@ function parseNameQualifiers(name: string): {
   const costMatch = baseName.match(/\(Costs?\s+(\d+)\s+Actions?\)/i);
   if (costMatch) {
     legendaryCost = parseInt(costMatch[1], 10);
-    baseName = baseName.replace(costMatch[0], '').trim();
+    baseName = baseName.replace(costMatch[0], "").trim();
   }
 
   // Recharge "(Recharge 5-6)"
@@ -530,30 +541,32 @@ function parseNameQualifiers(name: string): {
     const min = parseInt(rechargeMatch[1], 10);
     const max = rechargeMatch[2] ? parseInt(rechargeMatch[2], 10) : min;
     recharge = { min, max };
-    baseName = baseName.replace(rechargeMatch[0], '').trim();
+    baseName = baseName.replace(rechargeMatch[0], "").trim();
   }
 
   // Usage limit "(2/Day)" or "(2/Day Each)" or "(1e/Day Each)"
   const usageMatch = baseName.match(/\((\d+)\s*e?\s*\/\s*Day(?:\s+Each)?\)/i);
   if (usageMatch) {
-    usageLimit = { uses: parseInt(usageMatch[1], 10), per: 'day' };
-    baseName = baseName.replace(usageMatch[0], '').trim();
+    usageLimit = { uses: parseInt(usageMatch[1], 10), per: "day" };
+    baseName = baseName.replace(usageMatch[0], "").trim();
   }
 
   // Lair alternate uses "(3/Day, or 4/Day in Lair)"
   const lairAltMatch = baseName.match(
-    /\((\d+)\s*\/\s*Day,\s*or\s*(\d+)\s*\/\s*Day\s*in\s*Lair\)/i
+    /\((\d+)\s*\/\s*Day,\s*or\s*(\d+)\s*\/\s*Day\s*in\s*Lair\)/i,
   );
   if (lairAltMatch) {
-    usageLimit = { uses: parseInt(lairAltMatch[1], 10), per: 'day' };
+    usageLimit = { uses: parseInt(lairAltMatch[1], 10), per: "day" };
     tags.push(`altUsesInLair:${parseInt(lairAltMatch[2], 10)}`);
-    baseName = baseName.replace(lairAltMatch[0], '').trim();
+    baseName = baseName.replace(lairAltMatch[0], "").trim();
   }
 
   return { baseName, usageLimit, recharge, legendaryCost, tags };
 }
 
-function parseMultiattackItems(description: string): Array<{ name: string; count: number }> {
+function parseMultiattackItems(
+  description: string,
+): Array<{ name: string; count: number }> {
   const items: Array<{ name: string; count: number }> = [];
   const multiPattern =
     /makes?\s+(one|two|three|four|five|\d+)\s+([A-Za-z][A-Za-z'’ -]+?)\s+attacks?/gi;
@@ -586,7 +599,7 @@ interface SpellIndexEntry {
   id: string;
   name: string;
   castingTime?: {
-    type: 'action' | 'bonusAction' | 'reaction' | 'time';
+    type: "action" | "bonusAction" | "reaction" | "time";
     minutes?: number;
     ritual?: boolean;
     trigger?: string;
@@ -596,21 +609,21 @@ interface SpellIndexEntry {
 function normalizeName(name: string): string {
   return name
     .toLowerCase()
-    .replace(/\s*\([^)]*\)\s*/g, ' ')
-    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s*\([^)]*\)\s*/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
     .trim()
-    .replace(/\s+/g, ' ');
+    .replace(/\s+/g, " ");
 }
 
 function loadSpellIndex(srcDir: string): Map<string, SpellIndexEntry> {
-  const spellsPath = path.join(srcDir, 'spells.json');
+  const spellsPath = path.join(srcDir, "spells.json");
   if (!fs.existsSync(spellsPath)) return new Map();
 
-  const raw = fs.readFileSync(spellsPath, 'utf-8');
+  const raw = fs.readFileSync(spellsPath, "utf-8");
   const spells = JSON.parse(raw) as Array<{
     id: string;
     name: string;
-    castingTime?: SpellIndexEntry['castingTime'];
+    castingTime?: SpellIndexEntry["castingTime"];
   }>;
 
   const map = new Map<string, SpellIndexEntry>();
@@ -625,18 +638,18 @@ function loadSpellIndex(srcDir: string): Map<string, SpellIndexEntry> {
 }
 
 function mapCastingTimeToActivation(
-  castingTime: SpellIndexEntry['castingTime'] | undefined
+  castingTime: SpellIndexEntry["castingTime"] | undefined,
 ): ActivationType {
-  if (!castingTime) return 'special';
+  if (!castingTime) return "special";
   switch (castingTime.type) {
-    case 'action':
-      return 'action';
-    case 'bonusAction':
-      return 'bonusAction';
-    case 'reaction':
-      return 'reaction';
+    case "action":
+      return "action";
+    case "bonusAction":
+      return "bonusAction";
+    case "reaction":
+      return "reaction";
     default:
-      return 'special';
+      return "special";
   }
 }
 
@@ -652,7 +665,7 @@ function extractSpellcastingHeaderInfo(text: string): {
   } = {};
 
   const abilityMatch = text.match(
-    /using\s+(Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma)\s+as\s+the\s+spellcasting\s+ability/i
+    /using\s+(Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma)\s+as\s+the\s+spellcasting\s+ability/i,
   );
   if (abilityMatch) {
     out.spellcastingAbility = abilityKeyFromFullName(abilityMatch[1]);
@@ -661,47 +674,50 @@ function extractSpellcastingHeaderInfo(text: string): {
   const dcMatch = text.match(/spell\s+save\s+DC\s+(\d+)/i);
   if (dcMatch) out.spellSaveDC = parseInt(dcMatch[1], 10);
 
-  const atkMatch = text.match(/([+-]?\d+)\s+to\s+hit\s+with\s+spell\s+attacks?/i);
+  const atkMatch = text.match(
+    /([+-]?\d+)\s+to\s+hit\s+with\s+spell\s+attacks?/i,
+  );
   if (atkMatch) out.spellAttackBonus = parseInt(atkMatch[1], 10);
 
   return out;
 }
 
 function extractSpellsFromSpellcastingMarkdown(rawMarkdown: string): Array<{
-  kind: 'atWill' | 'perDay';
+  kind: "atWill" | "perDay";
   uses?: number;
   spellNames: string[];
 }> {
-  const lines = rawMarkdown.split('\n');
+  const lines = rawMarkdown.split("\n");
   const groups: Array<{
-    kind: 'atWill' | 'perDay';
+    kind: "atWill" | "perDay";
     uses?: number;
     spellNames: string[];
   }> = [];
 
   for (const line of lines) {
     const trimmed = line.trim();
-    if (!trimmed.startsWith('-')) continue;
+    if (!trimmed.startsWith("-")) continue;
 
     const atWillMatch = trimmed.match(/\*\*At\s+Will:\*\*\s*(.*)$/i);
     if (atWillMatch) {
       const spells = Array.from(atWillMatch[1].matchAll(/\*([^*]+)\*/g)).map(
-        (m) => m[1]!.trim()
+        (m) => m[1]!.trim(),
       );
-      if (spells.length > 0) groups.push({ kind: 'atWill', spellNames: spells });
+      if (spells.length > 0)
+        groups.push({ kind: "atWill", spellNames: spells });
       continue;
     }
 
     const perDayMatch = trimmed.match(
-      /\*\*(\d+)\s*e?\s*\/\s*Day\s+Each:\*\*\s*(.*)$/i
+      /\*\*(\d+)\s*e?\s*\/\s*Day\s+Each:\*\*\s*(.*)$/i,
     );
     if (perDayMatch) {
       const uses = parseInt(perDayMatch[1], 10);
       const spells = Array.from(perDayMatch[2].matchAll(/\*([^*]+)\*/g)).map(
-        (m) => m[1]!.trim()
+        (m) => m[1]!.trim(),
       );
       if (spells.length > 0) {
-        groups.push({ kind: 'perDay', uses, spellNames: spells });
+        groups.push({ kind: "perDay", uses, spellNames: spells });
       }
       continue;
     }
@@ -727,14 +743,14 @@ interface MonsterBlock {
 }
 
 function splitIntoMonsterBlocks(content: string): MonsterBlock[] {
-  const lines = content.split('\n');
+  const lines = content.split("\n");
   const blocks: MonsterBlock[] = [];
   let currentBlock: MonsterBlock | null = null;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]!;
     const headerMatch = line.match(/^##\s+(.+)$/);
-    if (headerMatch && !line.startsWith('###')) {
+    if (headerMatch && !line.startsWith("###")) {
       if (currentBlock) blocks.push(currentBlock);
       currentBlock = {
         name: headerMatch[1].trim(),
@@ -745,7 +761,8 @@ function splitIntoMonsterBlocks(content: string): MonsterBlock[] {
       continue;
     }
 
-    if (currentBlock) currentBlock.lines.push({ lineNumber: i + 1, text: line });
+    if (currentBlock)
+      currentBlock.lines.push({ lineNumber: i + 1, text: line });
   }
 
   if (currentBlock) blocks.push(currentBlock);
@@ -756,12 +773,13 @@ function flattenItemDescription(lines: string[]): string {
   return lines
     .map((l) => l.trim())
     .filter(Boolean)
-    .join(' ')
+    .join(" ")
     .trim();
 }
 
 function buildActionDefinitionForItem(opts: {
-  monster: Pick<MonsterV2, 'slug' | 'name' | 'abilityScores' | 'cr'>;
+  monster: Pick<MonsterV2, "slug" | "name" | "abilityScores" | "cr">;
+  sourceFile: string;
   section: ActionSection;
   sortOrder: number;
   itemName: string;
@@ -773,6 +791,7 @@ function buildActionDefinitionForItem(opts: {
 }): { primary: MonsterActionDefinitionV2; extra: MonsterActionDefinitionV2[] } {
   const {
     monster,
+    sourceFile,
     section,
     sortOrder,
     itemName,
@@ -788,7 +807,7 @@ function buildActionDefinitionForItem(opts: {
   const tags = [...qualifiers.tags];
 
   const raw = {
-    sourceFile: '12_MonstersA-Z.md',
+    sourceFile,
     startLine: rawStartLine,
     endLine: rawEndLine,
     markdown: rawMarkdown,
@@ -797,7 +816,7 @@ function buildActionDefinitionForItem(opts: {
   const keyBase = `monster:${monster.slug}:${section}:${slugify(name)}:${rawStartLine}`;
 
   // Multiattack
-  if (name.toLowerCase() === 'multiattack') {
+  if (name.toLowerCase() === "multiattack") {
     const items = parseMultiattackItems(flattenedDescription);
     return {
       primary: {
@@ -805,7 +824,7 @@ function buildActionDefinitionForItem(opts: {
         sortOrder,
         key: keyBase,
         name,
-        kind: 'multiattack',
+        kind: "multiattack",
         activation: sectionActivation(section),
         rulesText: flattenedDescription,
         tags,
@@ -821,7 +840,7 @@ function buildActionDefinitionForItem(opts: {
 
   // Attack action
   const attackMatch = flattenedDescription.match(
-    /\*(Melee|Ranged|Melee or Ranged)\s+Attack\s+Roll:\*\s*([+-]?\d+)/i
+    /\*(Melee|Ranged|Melee or Ranged)\s+Attack\s+Roll:\*\s*([+-]?\d+)/i,
   );
   if (attackMatch) {
     const attackType = mapAttackType(attackMatch[1]);
@@ -831,14 +850,16 @@ function buildActionDefinitionForItem(opts: {
       attackBonus,
       attackType,
       monster.abilityScores,
-      monster.cr
+      monster.cr,
     );
 
-    const reachMatch = flattenedDescription.match(/reach\s+(\d+)\s*ft\./i);
+    const reachMatch = flattenedDescription.match(
+      /reach\s+(\d+)\s*(?:ft\.?|feet)\b/i,
+    );
     const reach = reachMatch ? parseInt(reachMatch[1], 10) : undefined;
 
     const rangeMatch = flattenedDescription.match(
-      /range\s+(\d+)(?:\/(\d+))?\s*ft\./i
+      /range\s+(\d+)(?:\/(\d+))?\s*ft\./i,
     );
     const range = rangeMatch
       ? {
@@ -849,12 +870,12 @@ function buildActionDefinitionForItem(opts: {
 
     const damages = parseDamageFromText(flattenedDescription);
     const damage = damages.map((d) => ({
-      appliesOn: 'onHit' as const,
+      appliesOn: "onHit" as const,
       damageType: d.type,
       diceFormula: buildDiceFormula(
         d.dice,
         inferred.inferredAbility,
-        monster.abilityScores
+        monster.abilityScores,
       ),
     }));
 
@@ -864,7 +885,7 @@ function buildActionDefinitionForItem(opts: {
         sortOrder,
         key: keyBase,
         name,
-        kind: 'attack',
+        kind: "attack",
         activation: sectionActivation(section),
         rulesText: flattenedDescription,
         tags,
@@ -889,7 +910,7 @@ function buildActionDefinitionForItem(opts: {
 
   // Save action
   const saveMatch = flattenedDescription.match(
-    /\*(Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma)\s+Saving\s+Throw\*:\s*DC\s+(\d+)/i
+    /\*(Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma)\s+Saving\s+Throw\*:\s*DC\s+(\d+)/i,
   );
   if (saveMatch) {
     const saveAbility = abilityKeyFromFullName(saveMatch[1]);
@@ -899,7 +920,7 @@ function buildActionDefinitionForItem(opts: {
       saveDC,
       saveAbility,
       monster.abilityScores,
-      monster.cr
+      monster.cr,
     );
 
     const outcomes = parseOutcomeText(flattenedDescription);
@@ -907,7 +928,7 @@ function buildActionDefinitionForItem(opts: {
 
     const damages = parseDamageFromText(flattenedDescription);
     const damage = damages.map((d) => ({
-      appliesOn: 'onFailSave' as const,
+      appliesOn: "onFailSave" as const,
       damageType: d.type,
       diceFormula: buildDiceFormula(d.dice, undefined, monster.abilityScores),
     }));
@@ -918,7 +939,7 @@ function buildActionDefinitionForItem(opts: {
         sortOrder,
         key: keyBase,
         name,
-        kind: 'save',
+        kind: "save",
         activation: sectionActivation(section),
         rulesText: flattenedDescription,
         tags,
@@ -943,7 +964,7 @@ function buildActionDefinitionForItem(opts: {
 
   // Spellcasting block -> keep as a generic definition, but also create spellcast defs.
   const extra: MonsterActionDefinitionV2[] = [];
-  if (name.toLowerCase() === 'spellcasting') {
+  if (name.toLowerCase() === "spellcasting") {
     const headerInfo = extractSpellcastingHeaderInfo(flattenedDescription);
     const spellGroups = extractSpellsFromSpellcastingMarkdown(rawMarkdown);
 
@@ -953,19 +974,19 @@ function buildActionDefinitionForItem(opts: {
         const spell = spellIndex.get(normalized);
 
         const usageLimit =
-          group.kind === 'perDay' && group.uses
-            ? ({ uses: group.uses, per: 'day' } as UsageLimit)
+          group.kind === "perDay" && group.uses
+            ? ({ uses: group.uses, per: "day" } as UsageLimit)
             : undefined;
 
         const spellTags = [
-          ...(group.kind === 'atWill' ? ['atWill'] : [`perDay:${group.uses}`]),
+          ...(group.kind === "atWill" ? ["atWill"] : [`perDay:${group.uses}`]),
         ];
 
         const spellcastingAbility = headerInfo.spellcastingAbility;
         const spellSaveDC = headerInfo.spellSaveDC;
         const spellAttackBonus = headerInfo.spellAttackBonus;
 
-        const spellcast: MonsterActionDefinitionV2['spellcast'] = {
+        const spellcast: MonsterActionDefinitionV2["spellcast"] = {
           spellName: spell?.name ?? spellNameRaw,
           spellKey: spell?.id ? `spell:${spell.id}` : undefined,
           spellcastingAbility,
@@ -978,7 +999,7 @@ function buildActionDefinitionForItem(opts: {
             spellAttackBonus,
             spellcastingAbility,
             monster.abilityScores,
-            monster.cr
+            monster.cr,
           );
           spellcast.spellAttackBonusFormula = atk.attackBonusFormula;
           spellcast.miscSpellAttackBonus = atk.misc;
@@ -989,20 +1010,20 @@ function buildActionDefinitionForItem(opts: {
             spellSaveDC,
             spellcastingAbility,
             monster.abilityScores,
-            monster.cr
+            monster.cr,
           );
           spellcast.spellSaveDcFormula = dc.saveDcFormula;
           spellcast.miscSpellSaveDC = dc.misc;
         }
 
         extra.push({
-          section: 'spells',
+          section: "spells",
           sortOrder: extra.length,
           key: `monster:${monster.slug}:spells:${spell?.id ?? slugify(spellNameRaw)}:${rawStartLine}`,
           name: spellcast.spellName,
-          kind: 'spellcast',
+          kind: "spellcast",
           activation: mapCastingTimeToActivation(spell?.castingTime),
-          rulesText: '',
+          rulesText: "",
           tags: spellTags,
           usageLimit,
           spellcast,
@@ -1018,7 +1039,7 @@ function buildActionDefinitionForItem(opts: {
       sortOrder,
       key: keyBase,
       name,
-      kind: 'generic',
+      kind: "generic",
       activation: sectionActivation(section),
       rulesText: flattenedDescription,
       tags,
@@ -1033,18 +1054,19 @@ function buildActionDefinitionForItem(opts: {
 
 function parseMonsterBlock(
   block: MonsterBlock,
-  spellIndex: Map<string, SpellIndexEntry>
+  spellIndex: Map<string, SpellIndexEntry>,
+  sourceFile: string,
 ): MonsterV2 | null {
   const { name, lines, headerLineNumber, headerLine } = block;
 
   // Find the type line (first italic line): "*Large Aberration, Lawful Evil*"
-  let typeLine = '';
+  let typeLine = "";
   for (const l of lines) {
     if (
-      l.text.startsWith('*') &&
-      l.text.endsWith('*') &&
-      !l.text.startsWith('**') &&
-      !l.text.startsWith('***')
+      l.text.startsWith("*") &&
+      l.text.endsWith("*") &&
+      !l.text.startsWith("**") &&
+      !l.text.startsWith("***")
     ) {
       typeLine = l.text.slice(1, -1);
       break;
@@ -1073,7 +1095,7 @@ function parseMonsterBlock(
     key: `monster:${slug}`,
     slug,
     name,
-    source: 'srd',
+    source: "srd",
     size,
     creatureType,
     tags,
@@ -1089,51 +1111,53 @@ function parseMonsterBlock(
     languages: [],
     actionDefinitions: [],
     raw: {
-      sourceFile: '12_MonstersA-Z.md',
+      sourceFile,
       startLine: headerLineNumber,
       endLine:
-        lines.length > 0 ? lines[lines.length - 1]!.lineNumber : headerLineNumber,
-      markdown: [headerLine, ...lines.map((l) => l.text)].join('\n'),
+        lines.length > 0
+          ? lines[lines.length - 1]!.lineNumber
+          : headerLineNumber,
+      markdown: [headerLine, ...lines.map((l) => l.text)].join("\n"),
     },
   };
 
   // Parse bullet points
   for (const l of lines) {
     const line = l.text;
-    if (line.startsWith('- **Armor Class:**')) {
-      monster.ac = parseAC(line.replace('- **Armor Class:**', '').trim());
-    } else if (line.startsWith('- **Hit Points:**')) {
-      const hpData = parseHP(line.replace('- **Hit Points:**', '').trim());
+    if (line.startsWith("- **Armor Class:**")) {
+      monster.ac = parseAC(line.replace("- **Armor Class:**", "").trim());
+    } else if (line.startsWith("- **Hit Points:**")) {
+      const hpData = parseHP(line.replace("- **Hit Points:**", "").trim());
       monster.hp = { current: hpData.current, max: hpData.max };
       if (hpData.hitDice) monster.hitDice = hpData.hitDice;
-    } else if (line.startsWith('- **Speed:**')) {
-      monster.speed = parseSpeed(line.replace('- **Speed:**', '').trim());
-    } else if (line.startsWith('- **Skills**:')) {
+    } else if (line.startsWith("- **Speed:**")) {
+      monster.speed = parseSpeed(line.replace("- **Speed:**", "").trim());
+    } else if (line.startsWith("- **Skills**:")) {
       monster.skillProficiencies = parseSkills(
-        line.replace('- **Skills**:', '').trim()
+        line.replace("- **Skills**:", "").trim(),
       );
-    } else if (line.startsWith('- **Senses**:')) {
-      monster.senses = parseSenses(line.replace('- **Senses**:', '').trim());
-    } else if (line.startsWith('- **Languages**:')) {
+    } else if (line.startsWith("- **Senses**:")) {
+      monster.senses = parseSenses(line.replace("- **Senses**:", "").trim());
+    } else if (line.startsWith("- **Languages**:")) {
       monster.languages = parseLanguages(
-        line.replace('- **Languages**:', '').trim()
+        line.replace("- **Languages**:", "").trim(),
       );
-    } else if (line.startsWith('- **CR**')) {
-      const crData = parseCR(line.replace('- **CR**', '').trim());
+    } else if (line.startsWith("- **CR**")) {
+      const crData = parseCR(line.replace("- **CR**", "").trim());
       monster.cr = crData.cr;
       if (crData.xp) monster.xp = crData.xp;
       if (crData.xpInLair) monster.xpInLair = crData.xpInLair;
-    } else if (line.startsWith('- **Immunities**:')) {
-      const immText = line.replace('- **Immunities**:', '').trim();
+    } else if (line.startsWith("- **Immunities**:")) {
+      const immText = line.replace("- **Immunities**:", "").trim();
       const { damage, conditions } = parseImmunitiesResistances(immText);
       if (damage.length > 0) monster.immunities = damage;
       if (conditions.length > 0) monster.conditionImmunities = conditions;
-    } else if (line.startsWith('- **Resistances**:')) {
-      const resText = line.replace('- **Resistances**:', '').trim();
+    } else if (line.startsWith("- **Resistances**:")) {
+      const resText = line.replace("- **Resistances**:", "").trim();
       const { damage } = parseImmunitiesResistances(resText);
       if (damage.length > 0) monster.resistances = damage;
-    } else if (line.startsWith('- **Vulnerabilities**:')) {
-      const vulnText = line.replace('- **Vulnerabilities**:', '').trim();
+    } else if (line.startsWith("- **Vulnerabilities**:")) {
+      const vulnText = line.replace("- **Vulnerabilities**:", "").trim();
       const { damage } = parseImmunitiesResistances(vulnText);
       if (damage.length > 0) monster.vulnerabilities = damage;
     }
@@ -1142,40 +1166,46 @@ function parseMonsterBlock(
   // Parse ability score table
   const tableLines = lines
     .map((l) => l.text)
-    .filter((t) => t.startsWith('|') && t.includes('|'));
+    .filter((t) => t.startsWith("|") && t.includes("|"));
   const { scores, saveProficiencies } = parseAbilityScores(tableLines);
   monster.abilityScores = scores;
   monster.savingThrowProficiencies = saveProficiencies;
 
   // Parse sections + items (track raw markdown per item)
   let currentSection: ActionSection | null = null;
-  let currentItemName = '';
+  let currentItemName = "";
   let currentItemDescLines: string[] = [];
   let currentItemRawLines: MonsterBlockLine[] = [];
 
   const flushItem = () => {
-    if (!currentSection || !currentItemName || currentItemRawLines.length === 0) {
-      currentItemName = '';
+    if (
+      !currentSection ||
+      !currentItemName ||
+      currentItemRawLines.length === 0
+    ) {
+      currentItemName = "";
       currentItemDescLines = [];
       currentItemRawLines = [];
       return;
     }
 
-    const rawMarkdown = currentItemRawLines.map((l) => l.text).join('\n');
+    const rawMarkdown = currentItemRawLines.map((l) => l.text).join("\n");
     const flattened = flattenItemDescription(currentItemDescLines);
 
     const sortOrder = monster.actionDefinitions.filter(
-      (a) => a.section === currentSection
+      (a) => a.section === currentSection,
     ).length;
 
     const { primary, extra } = buildActionDefinitionForItem({
       monster,
+      sourceFile,
       section: currentSection,
       sortOrder,
       itemName: currentItemName,
       rawMarkdown,
       rawStartLine: currentItemRawLines[0]!.lineNumber,
-      rawEndLine: currentItemRawLines[currentItemRawLines.length - 1]!.lineNumber,
+      rawEndLine:
+        currentItemRawLines[currentItemRawLines.length - 1]!.lineNumber,
       flattenedDescription: flattened,
       spellIndex,
     });
@@ -1185,14 +1215,14 @@ function parseMonsterBlock(
 
     // Legendary resistance (store uses/day if present)
     if (
-      currentSection === 'traits' &&
-      currentItemName.toLowerCase().includes('legendary resistance') &&
-      primary.usageLimit?.per === 'day'
+      currentSection === "traits" &&
+      currentItemName.toLowerCase().includes("legendary resistance") &&
+      primary.usageLimit?.per === "day"
     ) {
       monster.legendaryResistance = primary.usageLimit.uses;
     }
 
-    currentItemName = '';
+    currentItemName = "";
     currentItemDescLines = [];
     currentItemRawLines = [];
   };
@@ -1200,38 +1230,38 @@ function parseMonsterBlock(
   for (const l of lines) {
     const line = l.text;
 
-    if (line.startsWith('### Traits')) {
+    if (line.startsWith("### Traits")) {
       flushItem();
-      currentSection = 'traits';
+      currentSection = "traits";
       continue;
     }
-    if (line.startsWith('### Actions')) {
+    if (line.startsWith("### Actions")) {
       flushItem();
-      currentSection = 'actions';
+      currentSection = "actions";
       continue;
     }
-    if (line.startsWith('### Bonus Actions')) {
+    if (line.startsWith("### Bonus Actions")) {
       flushItem();
-      currentSection = 'bonusActions';
+      currentSection = "bonusActions";
       continue;
     }
-    if (line.startsWith('### Reactions')) {
+    if (line.startsWith("### Reactions")) {
       flushItem();
-      currentSection = 'reactions';
+      currentSection = "reactions";
       continue;
     }
-    if (line.startsWith('### Legendary Actions')) {
+    if (line.startsWith("### Legendary Actions")) {
       flushItem();
-      currentSection = 'legendaryActions';
+      currentSection = "legendaryActions";
       continue;
     }
 
-    if (currentSection && line.startsWith('***') && line.includes('.***')) {
+    if (currentSection && line.startsWith("***") && line.includes(".***")) {
       flushItem();
       const itemMatch = line.match(/\*\*\*(.+?)\.\*\*\*\s*(.*)/);
       if (itemMatch) {
         currentItemName = itemMatch[1].trim();
-        currentItemDescLines = [itemMatch[2] ?? ''];
+        currentItemDescLines = [itemMatch[2] ?? ""];
         currentItemRawLines = [l];
       }
       continue;
@@ -1245,38 +1275,89 @@ function parseMonsterBlock(
 
   flushItem();
 
-  if (monster.actionDefinitions.some((a) => a.section === 'legendaryActions')) {
+  if (monster.actionDefinitions.some((a) => a.section === "legendaryActions")) {
     monster.legendaryActionCount = 3;
   }
 
   return monster;
 }
 
-function main() {
-  // __dirname is dist/ when compiled, so go up and into src/
-  const srcDir = path.join(__dirname, '..', 'src');
-  const inputPath = path.join(srcDir, '12_MonstersA-Z.md');
-  const outputPath = path.join(srcDir, 'monsters.v2.json');
+function parseMonsterFile(opts: {
+  srcDir: string;
+  sourceFile: string;
+  spellIndex: Map<string, SpellIndexEntry>;
+}): MonsterV2[] {
+  const { srcDir, sourceFile, spellIndex } = opts;
+  const inputPath = path.join(srcDir, sourceFile);
 
   console.log(`Reading monsters from: ${inputPath}`);
-  const content = fs.readFileSync(inputPath, 'utf-8');
+  const content = fs.readFileSync(inputPath, "utf-8");
 
   const blocks = splitIntoMonsterBlocks(content);
-  console.log(`Found ${blocks.length} monster blocks`);
+  console.log(`Found ${blocks.length} monster blocks in ${sourceFile}`);
+
+  const monsters: MonsterV2[] = [];
+  for (const block of blocks) {
+    const monster = parseMonsterBlock(block, spellIndex, sourceFile);
+    if (monster) monsters.push(monster);
+  }
+
+  console.log(`Parsed ${monsters.length} monsters from ${sourceFile}`);
+  return monsters;
+}
+
+function assertUniqueMonsterKeys(monsters: MonsterV2[]): void {
+  const seen = new Map<string, { sourceFile?: string; name: string }>();
+
+  for (const monster of monsters) {
+    const existing = seen.get(monster.key);
+    if (existing) {
+      throw new Error(
+        `Duplicate monster key "${monster.key}" found for "${monster.name}" in ` +
+          `"${monster.raw?.sourceFile ?? "unknown"}". Already seen for ` +
+          `"${existing.name}" in "${existing.sourceFile ?? "unknown"}".`,
+      );
+    }
+    seen.set(monster.key, {
+      sourceFile: monster.raw?.sourceFile,
+      name: monster.name,
+    });
+  }
+}
+
+function main() {
+  // __dirname is dist/ when compiled, so go up and into src/
+  const srcDir = path.join(__dirname, "..", "src");
+  const monstersSourceFile = "12_MonstersA-Z.md";
+  const animalsSourceFile = "13_Animals.md";
+  const outputPath = path.join(srcDir, "monsters.v2.json");
 
   const spellIndex = loadSpellIndex(srcDir);
   console.log(`Loaded ${spellIndex.size} spells for name→id mapping`);
 
-  const monsters: MonsterV2[] = [];
-  for (const block of blocks) {
-    const monster = parseMonsterBlock(block, spellIndex);
-    if (monster) monsters.push(monster);
-  }
+  const monstersFromMonstersChapter = parseMonsterFile({
+    srcDir,
+    sourceFile: monstersSourceFile,
+    spellIndex,
+  });
+  const monstersFromAnimalsChapter = parseMonsterFile({
+    srcDir,
+    sourceFile: animalsSourceFile,
+    spellIndex,
+  });
 
-  console.log(`Parsed ${monsters.length} monsters (v2)`);
+  const monsters = [
+    ...monstersFromMonstersChapter,
+    ...monstersFromAnimalsChapter,
+  ];
+  assertUniqueMonsterKeys(monsters);
+
+  console.log(
+    `Parsed ${monstersFromMonstersChapter.length} monsters + ` +
+      `${monstersFromAnimalsChapter.length} animals = ${monsters.length} total (v2)`,
+  );
   fs.writeFileSync(outputPath, JSON.stringify(monsters, null, 2));
   console.log(`Wrote v2 monsters to: ${outputPath}`);
 }
 
 main();
-

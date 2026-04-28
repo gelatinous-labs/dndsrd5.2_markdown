@@ -547,12 +547,12 @@ function flattenItemDescription(lines) {
         .trim();
 }
 function buildActionDefinitionForItem(opts) {
-    const { monster, section, sortOrder, itemName, rawMarkdown, rawStartLine, rawEndLine, flattenedDescription, spellIndex, } = opts;
+    const { monster, sourceFile, section, sortOrder, itemName, rawMarkdown, rawStartLine, rawEndLine, flattenedDescription, spellIndex, } = opts;
     const qualifiers = parseNameQualifiers(itemName);
     const name = qualifiers.baseName;
     const tags = [...qualifiers.tags];
     const raw = {
-        sourceFile: '12_MonstersA-Z.md',
+        sourceFile,
         startLine: rawStartLine,
         endLine: rawEndLine,
         markdown: rawMarkdown,
@@ -586,7 +586,7 @@ function buildActionDefinitionForItem(opts) {
         const attackType = mapAttackType(attackMatch[1]);
         const attackBonus = parseInt(attackMatch[2], 10);
         const inferred = (0, formulaInferenceV2_1.inferAttackFormula)(attackBonus, attackType, monster.abilityScores, monster.cr);
-        const reachMatch = flattenedDescription.match(/reach\s+(\d+)\s*ft\./i);
+        const reachMatch = flattenedDescription.match(/reach\s+(\d+)\s*(?:ft\.?|feet)\b/i);
         const reach = reachMatch ? parseInt(reachMatch[1], 10) : undefined;
         const rangeMatch = flattenedDescription.match(/range\s+(\d+)(?:\/(\d+))?\s*ft\./i);
         const range = rangeMatch
@@ -740,7 +740,7 @@ function buildActionDefinitionForItem(opts) {
         extra,
     };
 }
-function parseMonsterBlock(block, spellIndex) {
+function parseMonsterBlock(block, spellIndex, sourceFile) {
     const { name, lines, headerLineNumber, headerLine } = block;
     // Find the type line (first italic line): "*Large Aberration, Lawful Evil*"
     let typeLine = '';
@@ -787,7 +787,7 @@ function parseMonsterBlock(block, spellIndex) {
         languages: [],
         actionDefinitions: [],
         raw: {
-            sourceFile: '12_MonstersA-Z.md',
+            sourceFile,
             startLine: headerLineNumber,
             endLine: lines.length > 0 ? lines[lines.length - 1].lineNumber : headerLineNumber,
             markdown: [headerLine, ...lines.map((l) => l.text)].join('\n'),
@@ -870,6 +870,7 @@ function parseMonsterBlock(block, spellIndex) {
         const sortOrder = monster.actionDefinitions.filter((a) => a.section === currentSection).length;
         const { primary, extra } = buildActionDefinitionForItem({
             monster,
+            sourceFile,
             section: currentSection,
             sortOrder,
             itemName: currentItemName,
@@ -940,24 +941,59 @@ function parseMonsterBlock(block, spellIndex) {
     }
     return monster;
 }
-function main() {
-    // __dirname is dist/ when compiled, so go up and into src/
-    const srcDir = path.join(__dirname, '..', 'src');
-    const inputPath = path.join(srcDir, '12_MonstersA-Z.md');
-    const outputPath = path.join(srcDir, 'monsters.v2.json');
+function parseMonsterFile(opts) {
+    const { srcDir, sourceFile, spellIndex } = opts;
+    const inputPath = path.join(srcDir, sourceFile);
     console.log(`Reading monsters from: ${inputPath}`);
     const content = fs.readFileSync(inputPath, 'utf-8');
     const blocks = splitIntoMonsterBlocks(content);
-    console.log(`Found ${blocks.length} monster blocks`);
-    const spellIndex = loadSpellIndex(srcDir);
-    console.log(`Loaded ${spellIndex.size} spells for name→id mapping`);
+    console.log(`Found ${blocks.length} monster blocks in ${sourceFile}`);
     const monsters = [];
     for (const block of blocks) {
-        const monster = parseMonsterBlock(block, spellIndex);
+        const monster = parseMonsterBlock(block, spellIndex, sourceFile);
         if (monster)
             monsters.push(monster);
     }
-    console.log(`Parsed ${monsters.length} monsters (v2)`);
+    console.log(`Parsed ${monsters.length} monsters from ${sourceFile}`);
+    return monsters;
+}
+function assertUniqueMonsterKeys(monsters) {
+    const seen = new Map();
+    for (const monster of monsters) {
+        const existing = seen.get(monster.key);
+        if (existing) {
+            throw new Error(`Duplicate monster key "${monster.key}" found for "${monster.name}" in ` +
+                `"${monster.raw?.sourceFile ?? 'unknown'}". Already seen for ` +
+                `"${existing.name}" in "${existing.sourceFile ?? 'unknown'}".`);
+        }
+        seen.set(monster.key, {
+            sourceFile: monster.raw?.sourceFile,
+            name: monster.name,
+        });
+    }
+}
+function main() {
+    // __dirname is dist/ when compiled, so go up and into src/
+    const srcDir = path.join(__dirname, '..', 'src');
+    const monstersSourceFile = '12_MonstersA-Z.md';
+    const animalsSourceFile = '13_Animals.md';
+    const outputPath = path.join(srcDir, 'monsters.v2.json');
+    const spellIndex = loadSpellIndex(srcDir);
+    console.log(`Loaded ${spellIndex.size} spells for name→id mapping`);
+    const monstersFromMonstersChapter = parseMonsterFile({
+        srcDir,
+        sourceFile: monstersSourceFile,
+        spellIndex,
+    });
+    const monstersFromAnimalsChapter = parseMonsterFile({
+        srcDir,
+        sourceFile: animalsSourceFile,
+        spellIndex,
+    });
+    const monsters = [...monstersFromMonstersChapter, ...monstersFromAnimalsChapter];
+    assertUniqueMonsterKeys(monsters);
+    console.log(`Parsed ${monstersFromMonstersChapter.length} monsters + ` +
+        `${monstersFromAnimalsChapter.length} animals = ${monsters.length} total (v2)`);
     fs.writeFileSync(outputPath, JSON.stringify(monsters, null, 2));
     console.log(`Wrote v2 monsters to: ${outputPath}`);
 }
